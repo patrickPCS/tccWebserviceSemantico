@@ -42,5 +42,8 @@ public class RDFMediaType {
 
     public final static String APPLICATION_SPARQL_UPDATE = "application/sparql-update";
     public final static MediaType APPLICATION_SPARQL_UPDATE_TYPE = new MediaType("application","sparql-update");
-
+    
+    public final static String APPLICATION_JSON_LD = "application/ld+json";
+    public final static MediaType APPLICATION_JSON_LD_TYPE = new MediaType("application","ld+json");
+    
 }

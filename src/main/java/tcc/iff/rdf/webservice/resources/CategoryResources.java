@@ -16,12 +16,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.http.impl.auth.HttpAuthenticator;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -31,8 +33,7 @@ import tcc.iff.rdf.webservice.RDFMediaType;
 import tcc.iff.rdf.webservice.data.Category;
 //import tcc.iff.rdf.webservice.connection.Authentication;
 import tcc.iff.rdf.webservice.services.CategoryServices;
-@JsonIgnoreProperties(ignoreUnknown=true)
-@JsonSerialize
+
 @Path("/categories")
 public class CategoryResources {
 	
@@ -40,14 +41,15 @@ public class CategoryResources {
 	
 	
 	@GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String  listarCategorias() {
-		return catServices.getAllCategories().toString();
+    @Produces(RDFMediaType.APPLICATION_JSON_LD)
+    public Object  listarCategorias() {		
+		return catServices.getAllCategories().toString()
+				;
     }
 	
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(RDFMediaType.APPLICATION_JSON_LD)
 	@Path("{CatName}")
 	public Object getCategory(@PathParam("CatName") String catName) {
 		
@@ -57,7 +59,7 @@ public class CategoryResources {
 	
 		
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Consumes(RDFMediaType.APPLICATION_JSON_LD)
 	public Response adicionarCategoria(Category newCat) {
 	//public Response adicionarCategoria(@PathParam("newCat") String newCat, @Context UriInfo uriInfo) {
 		//auth.getAuthentication();

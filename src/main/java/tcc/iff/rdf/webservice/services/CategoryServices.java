@@ -3,6 +3,8 @@ package tcc.iff.rdf.webservice.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -18,12 +20,14 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import tcc.iff.rdf.webservice.connection.Authentication;
 import tcc.iff.rdf.webservice.data.Category;
-@JsonIgnoreProperties(ignoreUnknown=true)
-@JsonSerialize
+
 public class CategoryServices {
 	
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
@@ -54,16 +58,19 @@ public class CategoryServices {
 		
 	}
 	
-	public Object getCat(String catName) {
+	public QuerySolution getCat(String catName) {
 		auth.getAuthentication();
 
 		String q = "SELECT ?s ?p ?o WHERE { ?s ?p '"+catName+"' }";
 				
-		Query query = QueryFactory.create(q);
+		Query query = QueryFactory.create(q);	
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 		ResultSet result = qexec.execSelect();
-		ResultSetFormatter.outputAsJSON(result);
-		return result;
+		//ResultSetFormatter.outputAsJSON(result);
+		//ResultSetFormatter.outputAsXML(result);
+		
+		QuerySolution qs = result.next();
+		return qs;
 	}
 	
 	public List<QuerySolution> getAllCategories() {
@@ -74,15 +81,17 @@ public class CategoryServices {
 				"  ?subject ?predicate ?object\r\n" + 
 				"}\r\n"+
 				"LIMIT 30";
+		
 				
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 		//qexec.execSelect();
 		ResultSet results = qexec.execSelect();	
-		ResultSetFormatter.outputAsJSON(results);
+		//ResultSetFormatter.outputAsJSON(results);		
 		
 		List<QuerySolution> lista = new ArrayList<>();
 		while (results.hasNext()) {
+			//ResultSetFormatter.out(results);
 			QuerySolution qs = results.next();
 			lista.add(qs);
 			}
