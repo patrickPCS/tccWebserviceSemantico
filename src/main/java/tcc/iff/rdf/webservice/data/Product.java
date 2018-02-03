@@ -1,5 +1,13 @@
 package tcc.iff.rdf.webservice.data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize
+@XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Product {
 	
 	private String Name;

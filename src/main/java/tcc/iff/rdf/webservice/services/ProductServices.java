@@ -18,7 +18,7 @@ public class ProductServices {
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
 	Authentication auth = new Authentication();
 	
-	public List<Product> getAllProducts() {
+	public List<QuerySolution> getAllProducts() {
 		auth.getAuthentication();
 
 		String q = "PREFIX ex: <http://example.com/>\r\n" + 
@@ -35,9 +35,10 @@ public class ProductServices {
 		ResultSet results = qexec.execSelect();	
 		
 		
-		List<Product> lista = new ArrayList<>();
+		List<QuerySolution> lista = new ArrayList<>();
 		while (results.hasNext()) {
-			lista.add((Product) results);
+			QuerySolution qs = results.next();
+			lista.add(qs);
 			}
 		
 		return lista;
