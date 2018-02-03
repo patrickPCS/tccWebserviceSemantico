@@ -1,31 +1,32 @@
 package tcc.iff.rdf.webservice.data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonSerialize
+@XmlRootElement
 public class Category {
 	
-	private int id;
-	private String descricao;
-	
-	public int getId() {
-		return id;
+	private String name;
+
+	public String getName() {
+		return name;
 	}
-	public void setId(int id) {
-		this.id = id;
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	public String getDescricao() {
-		return descricao;
-	}
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-	
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -35,19 +36,18 @@ public class Category {
 		if (getClass() != obj.getClass())
 			return false;
 		Category other = (Category) obj;
-		if (id != other.id)
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
-		return "Category [id=" + id + ", descricao=" + descricao + "]";
+		return "Category [name=" + name + "]";
 	}
 	
 	
-	
-	
-	
-	
-
 }

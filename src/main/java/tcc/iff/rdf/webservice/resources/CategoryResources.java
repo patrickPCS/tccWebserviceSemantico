@@ -17,11 +17,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.http.impl.auth.HttpAuthenticator;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import tcc.iff.rdf.webservice.RDFMediaType;
 import tcc.iff.rdf.webservice.data.Category;
 //import tcc.iff.rdf.webservice.connection.Authentication;
 import tcc.iff.rdf.webservice.services.CategoryServices;
-
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonSerialize
 @Path("/categories")
 public class CategoryResources {
 	
@@ -30,19 +41,19 @@ public class CategoryResources {
 	
 	@GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Category> listarCategorias() {
-		catServices.getAllCategories();
-		List<Category> categories = new ArrayList<>();
-		return categories;
+    public String  listarCategorias() {
+		return catServices.getAllCategories().toString();
     }
+	
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{CategoryID}")
-	public Category getCategory() {
-		Category newCat = new Category();
-		return newCat;
+	@Path("{CatName}")
+	public Object getCategory(@PathParam("CatName") String catName) {
+		
+		return catServices.getCat(catName);
 	}
+	
 	
 		
 	@POST
@@ -60,17 +71,18 @@ public class CategoryResources {
 	}
 	
 	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response alterarCategoria(Category cat) {
-		catServices.updateCategory(cat);
+	@Path("{oldName}/{newName}")
+	public Response alterarCategoria(@PathParam("oldName") String oldName, @PathParam("newName") String newName) {
+		catServices.updateCategory(oldName,newName);
 		   return Response.status(Response.Status.OK).build();
 	}
 
 	@DELETE
-	@Path("{CategoryID}")
-	public Response removerCategoria(@PathParam("CategoriaID") int catID) {
-		catServices.deleteCategory(catID);
-		   return Response.status(Response.Status.NO_CONTENT).build();
+	@Path("{CatName}")
+	public Response removerCategoria(@PathParam("CatName") String catName) {
+		catServices.deleteCategory(catName);
+		
+		return Response.status(Response.Status.NO_CONTENT).build();
 
 	}
 	

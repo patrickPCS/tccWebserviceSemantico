@@ -3,14 +3,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>tcc.iff.rdf</groupId>
-    <artifactId>webservice</artifactId>
+    <groupId>restful</groupId>
+    <artifactId>tcc.iff.rdf.api</artifactId>
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>webservice</name>
+    <name>tcc.iff.rdf.api</name>
 
     <build>
-        <finalName>webservice</finalName>
+        <finalName>tcc.iff.rdf.api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -38,14 +38,56 @@
     </dependencyManagement>
 
     <dependencies>
-    
-	    <dependency>
+		<dependency>
 		    <groupId>org.apache.jena</groupId>
 		    <artifactId>apache-jena-libs</artifactId>
 		    <type>pom</type>
 		    <version>3.6.0</version>
 		  </dependency>
-    
+		
+	    <dependency>
+		    <groupId>org.glassfish.jersey.connectors</groupId>
+		    <artifactId>jersey-grizzly-connector</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.connectors</groupId>
+		    <artifactId>jersey-apache-connector</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.connectors</groupId>
+		    <artifactId>jersey-jetty-connector</artifactId>
+		</dependency>
+	    <dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-grizzly2-http</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-grizzly2-servlet</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-jdk-http</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-simple-http</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-jetty-http</artifactId>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-jetty-servlet</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
@@ -58,14 +100,9 @@
             <artifactId>jersey-media-moxy</artifactId>
         </dependency>
         -->
-        <dependency>
-        	<groupId>org.glassfish.jersey.media</groupId>
-        	<artifactId>jersey-media-json-jackson</artifactId>
-        	<scope>runtime</scope>
-        </dependency>
     </dependencies>
     <properties>
-        <jersey.version>2.16</jersey.version>
+        <jersey.version>2.25.1</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 </project>
