@@ -30,7 +30,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import tcc.iff.rdf.webservice.RDFMediaType;
-import tcc.iff.rdf.webservice.data.Category;
 //import tcc.iff.rdf.webservice.connection.Authentication;
 import tcc.iff.rdf.webservice.services.CategoryServices;
 
@@ -60,7 +59,7 @@ public class CategoryResources {
 		
 	@POST
 	@Consumes(RDFMediaType.APPLICATION_JSON_LD)
-	public Response adicionarCategoria(Category newCat) {
+	public Response adicionarCategoria(String newCat) {
 	//public Response adicionarCategoria(@PathParam("newCat") String newCat, @Context UriInfo uriInfo) {
 		//auth.getAuthentication();
 		 catServices.addCategory(newCat);

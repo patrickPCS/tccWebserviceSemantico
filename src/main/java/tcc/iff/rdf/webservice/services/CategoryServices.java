@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import tcc.iff.rdf.webservice.connection.Authentication;
-import tcc.iff.rdf.webservice.data.Category;
+
 
 public class CategoryServices {
 	
@@ -34,11 +34,10 @@ public class CategoryServices {
 	Authentication auth = new Authentication();
 
 	
-	public void addCategory(Category newCat) {
+	public void addCategory(String newCat) {
 		
 		auth.getAuthentication();
 
-		String name = newCat.getName();
 			
 		String updateQuery = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
@@ -48,7 +47,7 @@ public class CategoryServices {
 				"INSERT DATA\r\n" + 
 				"{\r\n" + 
 				"ex:Categoria	rdf:type	gr:category;\r\n" + 
-				"		gr:name		"+name+"	.\r\n" + 
+				"		gr:name			.\r\n" + 
 				"		\r\n" + 
 				"}";		
 		
