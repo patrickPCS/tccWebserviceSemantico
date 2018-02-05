@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>tcc.iff.rdf</groupId>
+    <artifactId>webservice</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>webservice</name>
+
+    <build>
+    <finalName>webservice</finalName>
+    <pluginManagement>  
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            
+    		<plugin>
+    <groupId>com.sebastian-daschner</groupId>
+    <artifactId>jaxrs-analyzer-maven-plugin</artifactId>
+    <version>0.13-SNAPSHOT</version>
+    <executions>
+        <execution>
+        <phase>process-test-classes</phase>
+            <goals>
+                <goal>analyze-jaxrs</goal>
+            </goals>
+            <configuration>
+                <!-- Available backends are plaintext (default), swagger and asciidoc -->
+                <backend>plaintext</backend>
+                <!-- Domain of the deployed project, defaults to "" -->
+                <deployedDomain>example.com</deployedDomain>
+                <!-- Comma separated list of Swagger schemes (only for if backend is swagger, defaults to http) -->
+                <swaggerSchemes>https,http</swaggerSchemes>
+                <!-- Enables rendering of Swagger tags (defaults to false -> default tag will be used) -->
+                <renderSwaggerTags>true</renderSwaggerTags>
+                <!-- The number at which path position the Swagger tags will be extracted (defaults to 0) -->
+                <swaggerTagsPathOffset>1</swaggerTagsPathOffset>
+                <!-- Directory (relative to buildDir) where resources will be generated (defaults to jaxrs-analyzer) -->
+                <resourcesDir>jaxrs-analyzer</resourcesDir>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+        </plugins>
+       </pluginManagement>  
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+    
+	    <dependency>
+		    <groupId>org.apache.jena</groupId>
+		    <artifactId>apache-jena-libs</artifactId>
+		    <type>pom</type>
+		    <version>3.6.0</version>
+		  </dependency>
+    
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
+            <!-- use the following artifactId if you don't need servlet 2.x compatibility -->
+            <!-- artifactId>jersey-container-servlet</artifactId -->
+        </dependency>
+        <!-- uncomment this to get JSON support
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+        </dependency>
+        -->
+        <dependency>
+        	<groupId>org.glassfish.jersey.media</groupId>
+        	<artifactId>jersey-media-json-jackson</artifactId>
+        	<scope>runtime</scope>
+        </dependency>
+        
+    </dependencies>
+    <properties>
+        <jersey.version>2.16</jersey.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+</project>

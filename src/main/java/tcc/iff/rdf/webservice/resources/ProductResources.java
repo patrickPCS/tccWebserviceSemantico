@@ -24,23 +24,14 @@ ProductServices prodServ = new ProductServices();
 	@Path("{prodName}")
 	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
 	public Response alterarProduto(@PathParam("prodName") String prodID, String newProduct) {
-		
 		prodServ.updateProduct(prodID, newProduct);
-		
 		return Response.status(Response.Status.CREATED).build();
 	}
 	
 	@POST
 	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
 	public Response adicionarProduto(String newProduct) {
-	//public Response adicionarCategoria(@PathParam("newCat") String newCat, @Context UriInfo uriInfo) {
-		//auth.getAuthentication();
-		prodServ.addProduct(newProduct);
-		//URI uri = uriInfo.getAbsolutePathBuilder().build();
-		/*return Response.created(uri)
-				.entity(newCat)
-				.build();
-		*/
+	   prodServ.addProduct(newProduct);
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
