@@ -9,12 +9,10 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.util.FileManager;
 
 import tcc.iff.rdf.webservice.connection.Authentication;
 
@@ -41,14 +39,10 @@ public String getAllProducts() {
 		
 		ResultSet results = qexec.execSelect();	
 		
-		// write to a ByteArrayOutputStream
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-		//ResultSetFormatter.outputAsJSON(outputStream, results);
+		ResultSetFormatter.outputAsJSON(outputStream, results);
 		
-		ResultSetFormatter.outputAsXML(outputStream, results);
-		
-		// and turn that into a String
 		String json = new String(outputStream.toByteArray());
 
 		return json;
@@ -71,12 +65,10 @@ public String getProduct(String prodName) {
 	
 	ResultSet results = qexec.execSelect();	
 	
-	// write to a ByteArrayOutputStream
 	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 	ResultSetFormatter.outputAsJSON(outputStream, results);
 
-	// and turn that into a String
 	String json = new String(outputStream.toByteArray());
 
 	return json;
