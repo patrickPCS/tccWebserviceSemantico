@@ -9,23 +9,26 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
 import tcc.iff.rdf.webservice.RDFMediaType;
 import tcc.iff.rdf.webservice.services.ProductServices;
 
-@Path("/products")
+@Path("/")
 public class ProductResources {
 	
-ProductServices prodServ = new ProductServices();
-
-	@PUT
-	@Path("{prodName}")
-	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
-	public Response alterarProduto(@PathParam("prodName") String prodID, String newProduct) {
-		prodServ.updateProduct(prodID, newProduct);
-		return Response.status(Response.Status.CREATED).build();
+	ProductServices prodServ = new ProductServices();
+	@GET
+    @Produces(RDFMediaType.APPLICATION_RDFXML)
+    public String listarProdutos() {		
+		return prodServ.getAllProducts();		
+    }
+	
+	@DELETE
+	public String deletarProdutos() {
+		return "Método deletarProdutos ok";
 	}
 	
 	@POST
@@ -35,26 +38,41 @@ ProductServices prodServ = new ProductServices();
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
+	@GET
+	@Path("/{ProductID}")
+	@Produces(RDFMediaType.APPLICATION_SPARQL_UPDATE)
+	public String lerProduto(@PathParam("ProductID") String prodName) {
+		return prodServ.getProduct(prodName);
+	}
+	
 	@DELETE
-	@Path("{prodName}")
-	public Response deletarProduto(@PathParam("prodName") String prodName) {
+	@Path("{ProductID}")
+	public Response deletarProduto(@PathParam("ProductID") String prodName) {
 		prodServ.deleteCategory(prodName);
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
-	@GET
-	@Path("/{prodName}")
-	@Produces(RDFMediaType.APPLICATION_JSON_LD)
-	public String lerProduto(@PathParam("prodName") String prodName) {
-		return prodServ.getProduct(prodName);
+	@PUT
+	@Path("{ProductID}")
+	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
+	public Response alterarProduto(@PathParam("ProductID") String prodID, String newProduct) {
+		prodServ.updateProduct(prodID, newProduct);
+		return Response.status(Response.Status.CREATED).build();
 	}
 
-
-	@GET
-    @Produces(RDFMediaType.APPLICATION_JSON_LD)
-    public String listarProdutos() {		
-		return prodServ.getAllProducts();
-				
-    }
+	
+/********************************************************************************/	
+	
+	@Path("/{ProductID}/offers")
+	public OfferResources get1OfferResources() {
+		return new OfferResources();
+	}
+	
+	@Path("/offers")
+	public OfferResources get2OfferResources() {
+		return new OfferResources();
+	}
+	
+	
 
 }
