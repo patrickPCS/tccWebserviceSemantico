@@ -1,7 +1,7 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
-
+import java.util.Dictionary;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -76,25 +76,19 @@ public String getProduct(String prodName) {
 
 
 //@POST
-public void addProduct(String newProduct) {
+public void addProduct(String category, String newProduct) {
 		
 		auth.getAuthentication();
-
-			
-		String updateQuery = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX ex: <http://example.com/>\r\n" + 
-				"\r\n" + 
-				"INSERT DATA\r\n" + 
-				"{\r\n" + 
-				"  GRAPH ex:Produtos\r\n" + 
-				"{ \n"+
-				newProduct+ "\n"+
-				" }\r\n" + 
-				"}\r\n" + 
-				";";		
 		
-		UpdateRequest request = UpdateFactory.create(updateQuery);
+		String replace1 = newProduct.replace("BEGIN", "INSERT DATA\r\n" + 
+				"{\r\n" + 
+				"  GRAPH <http://example.com/categories/"+category+"> \r\n" + 
+				"  {\r\n" + 
+				"");
+		
+		String queryUpdate = replace1.replace("END", "}};");
+		
+		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
 		

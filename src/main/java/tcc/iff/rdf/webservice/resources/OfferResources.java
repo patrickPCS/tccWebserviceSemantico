@@ -8,7 +8,7 @@ import javax.ws.rs.Path;
 
 @Path("/")
 public class OfferResources {
-	
+	/*
 	@GET
 	public String getAllOffers() {
 		return "Método getAllOffers ok";
@@ -41,4 +41,5 @@ public class OfferResources {
 	public String updateOffer() {
 		return "Método updateOffer ok";
 	}
+	*/
 }

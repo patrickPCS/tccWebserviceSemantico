@@ -25,15 +25,17 @@ public class ProductResources {
 		return prodServ.getAllProducts();		
     }
 	
+	/*
 	@DELETE
 	public String deletarProdutos() {
 		return "Método deletarProdutos ok";
 	}
+	*/
 	
 	@POST
 	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
-	public Response adicionarProduto(String newProduct) {
-	   prodServ.addProduct(newProduct);
+	public Response adicionarProduto(@PathParam("CategoryID") String category, String newProduct) {
+	   prodServ.addProduct(category, newProduct);
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
