@@ -9,32 +9,33 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-
 import tcc.iff.rdf.webservice.RDFMediaType;
+import tcc.iff.rdf.webservice.model.Product;
 import tcc.iff.rdf.webservice.services.ProductServices;
 
-@Path("/")
+@Path("/products")
 public class ProductResources {
 	
 	ProductServices prodServ = new ProductServices();
 	@GET
-    @Produces(RDFMediaType.APPLICATION_RDFXML)
+    @Produces(RDFMediaType.APPLICATION_JSON_LD)
     public String listarProdutos() {		
 		return prodServ.getAllProducts();		
     }
 	
-	/*
+	
 	@DELETE
 	public String deletarProdutos() {
 		return "Método deletarProdutos ok";
 	}
-	*/
+	
 	
 	@POST
-	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
-	public Response adicionarProduto(@PathParam("CategoryID") String category, String newProduct) {
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response adicionarProduto(@PathParam("CategoryID") String category, Product newProduct) {
 	   prodServ.addProduct(category, newProduct);
 	   return Response.status(Response.Status.CREATED).build();
 	}
@@ -60,20 +61,5 @@ public class ProductResources {
 		prodServ.updateProduct(prodID, newProduct);
 		return Response.status(Response.Status.CREATED).build();
 	}
-
 	
-/********************************************************************************/	
-	
-	@Path("/{ProductID}/offers")
-	public OfferResources get1OfferResources() {
-		return new OfferResources();
-	}
-	
-	@Path("/offers")
-	public OfferResources get2OfferResources() {
-		return new OfferResources();
-	}
-	
-	
-
 }
