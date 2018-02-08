@@ -32,7 +32,6 @@ public class ProductResources {
 		return "Método deletarProdutos ok";
 	}
 	
-	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response adicionarProduto(@PathParam("CategoryID") String category, Product newProduct) {
