@@ -4,15 +4,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Company {
-	private String site;
+	private String companyURL;
 	private String legalName;
-	private String offer;
+	private String email;
+	private String catalogURI;
 	
-	public String getSite() {
-		return site;
+	public String getEmail() {
+		return email;
 	}
-	public void setSite(String site) {
-		this.site = site;
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getCompanyURL() {
+		return companyURL;
+	}
+	public void setCompanyURL(String companyURL) {
+		this.companyURL = companyURL;
 	}
 	public String getLegalName() {
 		return legalName;
@@ -20,12 +27,14 @@ public class Company {
 	public void setLegalName(String legalName) {
 		this.legalName = legalName;
 	}
-	public String getOffer() {
-		return offer;
+	public String getCatalogURI() {
+		return catalogURI;
 	}
-	public void setOffer(String offer) {
-		this.offer = offer;
+	public void setCatalogURI(String catalogURI) {
+		this.catalogURI = catalogURI;
 	}
+	
+	
 	
 	
 }

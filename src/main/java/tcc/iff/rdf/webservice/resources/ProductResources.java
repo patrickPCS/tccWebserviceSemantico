@@ -26,16 +26,17 @@ public class ProductResources {
 		return prodServ.getAllProducts();		
     }
 	
-	
 	@DELETE
-	public String deletarProdutos() {
-		return "Método deletarProdutos ok";
+	public Response deletarProdutos() {
+		prodServ.deleteAllProducts();
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response adicionarProduto(@PathParam("CategoryID") String category, Product newProduct) {
-	   prodServ.addProduct(category, newProduct);
+	//public Response adicionarProduto(@PathParam("CategoryID") String category, Product newProduct) {
+	public Response adicionarProduto(Product newProduct) {
+		prodServ.addProduct(newProduct);
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
@@ -47,16 +48,16 @@ public class ProductResources {
 	}
 	
 	@DELETE
-	@Path("{ProductID}")
+	@Path("/{ProductID}")
 	public Response deletarProduto(@PathParam("ProductID") String prodName) {
-		prodServ.deleteCategory(prodName);
+		prodServ.deleteProduct(prodName);
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
 	@PUT
-	@Path("{ProductID}")
+	@Path("/{ProductID}")
 	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
-	public Response alterarProduto(@PathParam("ProductID") String prodID, String newProduct) {
+	public Response alterarProduto(@PathParam("ProductID") String prodID, Product newProduct) {
 		prodServ.updateProduct(prodID, newProduct);
 		return Response.status(Response.Status.CREATED).build();
 	}

@@ -6,22 +6,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Product {
 	
 	private String productURI;
-	private String type;
+	private String productID; //produto equivalente no pto
 	private String name;
 	private String description;
 	
+	public String getproductID() {
+		return productID;
+	}
+	public void setproductID(String productID) {
+		this.productID = productID;
+	}
 	public String getProductURI() {
 		return productURI;
 	}
 	public void setProductURI(String productURI) {
 		this.productURI = productURI;
 	}
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
+	
 	public String getName() {
 		return name;
 	}
@@ -34,7 +35,4 @@ public class Product {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
-
 }

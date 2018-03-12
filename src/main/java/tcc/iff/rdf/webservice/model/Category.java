@@ -1,16 +1,18 @@
 package tcc.iff.rdf.webservice.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Category {
 	
-	private String category;
+	private String name;
 
-	public String getCategory() {
-		return category;
+	public String getName() {
+		return name;
 	}
 
-	public void setCategory(String category) {
-		this.category = category;
+	public void setName(String name) {
+		this.name = name;
 	}
-	
 	
 }
