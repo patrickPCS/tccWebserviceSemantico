@@ -27,19 +27,16 @@ public class ProductServices {
 		auth.getAuthentication();
 
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+		
 				"\r\n" + 
 				"SELECT ?ProductURI WHERE {?ProductURI	rdfs:subClassOf	gr:ProductOrService}";
-
+		
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
-		Model results = qexec.execConstruct();
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		results.write(outputStream, "JSON-LD");
-		String output = new String(outputStream.toByteArray());
-
-		return output;
-
+		ResultSet results = qexec.execSelect();
+		return ResultSetFormatter.asText(results);
 
 	}
 
@@ -48,23 +45,21 @@ public class ProductServices {
 		auth.getAuthentication();
 
 		String q = "PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
 				"\r\n" + 
 				"DESCRIBE ?productURI\r\n" + 
-				"WHERE { ?productURI owl:productID pto:"+prodName+" }";
+				"WHERE { ?productURI owl:sameAs pto:"+prodName+" }";
 
 
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
-		ResultSet results = qexec.execSelect();	
-
+		Model results = qexec.execDescribe();	
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		results.write(outputStream, "JSON-LD");
+		String output = new String(outputStream.toByteArray());
 
-		ResultSetFormatter.outputAsJSON(outputStream, results);
-
-		String json = new String(outputStream.toByteArray());
-
-		return json;
+		return output;
 	}
 
 
@@ -77,16 +72,18 @@ public class ProductServices {
 		String name = newProduct.getName();
 		String description = newProduct.getDescription();
 
-		String queryUpdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX ex: <http://example.com/>\r\n" + 
-				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+		String queryUpdate = 
+						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
+						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  "+productURI+"    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"                owl:sameAs			pto:"+productID+";\r\n" + 
-				"                gr:name			"+name+";\r\n" + 
-				"                gr:description		"+description+"	.\r\n" + 
+				"  <"+productURI+">    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+				"               	 owl:sameAs			pto:"+productID+";\r\n" + 
+				"                	 gr:name	   		'"+name+"';\r\n" + 
+				"               	 gr:description		'"+description+"'	.\r\n" + 
 				"                \r\n" + 
 				"}";
 
@@ -109,6 +106,8 @@ public class ProductServices {
 		String queryUpdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX ex: <http://example.com/>\r\n" + 
 				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
 				"\r\n" + 
 				"DELETE \r\n" + 
 				"	{ ?productURL ?p ?s }\r\n" + 
@@ -121,10 +120,10 @@ public class ProductServices {
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  "+productURI+"    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+				"  <"+productURI+">    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
 				"                owl:sameAs			pto:"+productID+";\r\n" + 
-				"                gr:name			"+name+";\r\n" + 
-				"                gr:description		"+description+"	.\r\n" + 
+				"                gr:name			'"+name+"';\r\n" + 
+				"                gr:description		'"+description+"'	.\r\n" + 
 				"                \r\n" + 
 				"}";
 
@@ -141,6 +140,8 @@ public class ProductServices {
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 						"PREFIX ex: <http://example.com/>\r\n" + 
 						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
+						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
 						"\r\n" + 
 						"DELETE \r\n" + 
 						"	{ ?productURL ?p ?s }\r\n" + 
@@ -162,6 +163,7 @@ public class ProductServices {
 		auth.getAuthentication();
 		
 		String updateQuery = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
 				"\r\n" + 
 				"DELETE \r\n" + 
 				"	{ ?productURL ?p ?s }\r\n" + 

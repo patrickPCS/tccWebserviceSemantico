@@ -1,6 +1,5 @@
 package tcc.iff.rdf.webservice.resources;
 
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,7 +20,7 @@ public class ProductResources {
 	
 	ProductServices prodServ = new ProductServices();
 	@GET
-    @Produces(RDFMediaType.APPLICATION_JSON_LD)
+    @Produces(MediaType.TEXT_PLAIN)
     public String listarProdutos() {		
 		return prodServ.getAllProducts();		
     }
@@ -34,15 +33,14 @@ public class ProductResources {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	//public Response adicionarProduto(@PathParam("CategoryID") String category, Product newProduct) {
-	public Response adicionarProduto(Product newProduct) {
+		public Response adicionarProduto(Product newProduct) {
 		prodServ.addProduct(newProduct);
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
 	@GET
 	@Path("/{ProductID}")
-	@Produces(RDFMediaType.APPLICATION_SPARQL_UPDATE)
+    @Produces(RDFMediaType.APPLICATION_JSON_LD)
 	public String lerProduto(@PathParam("ProductID") String prodName) {
 		return prodServ.getProduct(prodName);
 	}
@@ -56,7 +54,7 @@ public class ProductResources {
 	
 	@PUT
 	@Path("/{ProductID}")
-	@Consumes(RDFMediaType.APPLICATION_SPARQL_UPDATE)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response alterarProduto(@PathParam("ProductID") String prodID, Product newProduct) {
 		prodServ.updateProduct(prodID, newProduct);
 		return Response.status(Response.Status.CREATED).build();
