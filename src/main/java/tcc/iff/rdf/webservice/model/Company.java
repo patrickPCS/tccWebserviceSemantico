@@ -4,11 +4,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Company {
+	private String companyID;
 	private String companyURL;
 	private String legalName;
 	private String email;
 	private String catalogURI;
 	
+	public String getCompanyID() {
+		return companyID;
+	}
+	public void setCompanyID(String companyID) {
+		this.companyID = companyID;
+	}
 	public String getEmail() {
 		return email;
 	}
