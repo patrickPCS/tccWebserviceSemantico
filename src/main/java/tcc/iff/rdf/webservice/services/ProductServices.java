@@ -1,6 +1,8 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -62,35 +64,38 @@ public class ProductServices {
 		return output;
 	}
 
-
 	//@POST
-	public void addProduct(Product newProduct) {
+	public void addProduct(List<Product> newProduct) {
 		auth.getAuthentication();
 
-		String productURI = newProduct.getProductURI();
-		String productID = newProduct.getproductID();
-		String name = newProduct.getName();
-		String description = newProduct.getDescription();
+		int TAM;
+		TAM = newProduct.size();
+		for(int i=0; i<TAM; i++) {
 
-		String queryUpdate = 
-						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
-						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
-				"\r\n" + 
-				"INSERT DATA\r\n" + 
-				"{ \r\n" + 
-				"  <"+productURI+">    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"               	 owl:sameAs			pto:"+productID+";\r\n" + 
-				"                	 gr:name	   		'"+name+"';\r\n" + 
-				"               	 gr:description		'"+description+"'	.\r\n" + 
-				"                \r\n" + 
-				"}";
+			String productURI = newProduct.get(i).getProductURI();
+			String productID = newProduct.get(i).getproductID();
+			String name = newProduct.get(i).getName();
+			String description = newProduct.get(i).getDescription();
 
-		UpdateRequest request = UpdateFactory.create(queryUpdate);
-		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
-		up.execute();
+			String queryUpdate = 
+					"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+							"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+							"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
+							"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+							"\r\n" + 
+							"INSERT DATA\r\n" + 
+							"{ \r\n" + 
+							"  <"+productURI+">    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+							"               	 owl:sameAs			pto:"+productID+";\r\n" + 
+							"                	 gr:name	   		'"+name+"';\r\n" + 
+							"               	 gr:description		'"+description+"'	.\r\n" + 
+							"                \r\n" + 
+							"}";
 
+			UpdateRequest request = UpdateFactory.create(queryUpdate);
+			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
+			up.execute();
+		}
 	}
 
 	//@PUT

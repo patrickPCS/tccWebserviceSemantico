@@ -1,6 +1,7 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -69,26 +70,29 @@ public class CategoryServices {
 	}
 
 	//POST
-	public void addCategory(Category newCategory) {
+	public void addCategory(List<Category> newCategory) {
 		auth.getAuthentication();
-
-		String name = newCategory.getName();
-		String id = newCategory.getId();
-
-		String queryUpdate = 
-						"PREFIX ex: <http://example.com/>\r\n" + 
-						"PREFIX exc: <http://example.com/Category/>\r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"\r\n" + 
-						"INSERT DATA\r\n" + 
-						"{ \r\n" + 
-						"  exc:"+id+"       rdf:type     ex:Category;\r\n" + 
-						"  	                        ex:name    '"+name+"' .\r\n" + 
-						"}";
-
-		UpdateRequest request = UpdateFactory.create(queryUpdate);
-		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
-		up.execute();
+		int TAM;
+		TAM = newCategory.size();
+		for(int i=0; i<TAM; i++) {
+			String name = newCategory.get(i).getName();
+			String id = newCategory.get(i).getId();
+	
+			String queryUpdate = 
+							"PREFIX ex: <http://example.com/>\r\n" + 
+							"PREFIX exc: <http://example.com/Category/>\r\n" + 
+							"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+							"\r\n" + 
+							"INSERT DATA\r\n" + 
+							"{ \r\n" + 
+							"  exc:"+id+"       rdf:type     ex:Category;\r\n" + 
+							"  	                        ex:name    '"+name+"' .\r\n" + 
+							"}";
+	
+			UpdateRequest request = UpdateFactory.create(queryUpdate);
+			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
+			up.execute();
+		}
 	}
 
 	//PUT

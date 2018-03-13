@@ -1,5 +1,7 @@
 package tcc.iff.rdf.webservice.resources;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -32,8 +34,8 @@ public class CategoryResources {
 		
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
-			public Response adicionarCategoria(Category newCategory) {
-			catServ.addCategory(newCategory);
+			public Response adicionarCategoria(List<Category> CategoryList) {
+			catServ.addCategory(CategoryList);
 		   return Response.status(Response.Status.CREATED).build();
 		}
 		

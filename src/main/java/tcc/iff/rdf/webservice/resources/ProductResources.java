@@ -1,5 +1,7 @@
 package tcc.iff.rdf.webservice.resources;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -33,8 +35,8 @@ public class ProductResources {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-		public Response adicionarProduto(Product newProduct) {
-		prodServ.addProduct(newProduct);
+		public Response adicionarProduto(List<Product> ProductList) {
+		prodServ.addProduct(ProductList);
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
