@@ -29,10 +29,10 @@ public class ProductServices {
 		auth.getAuthentication();
 
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 		
 				"\r\n" + 
-				"SELECT ?ProductURI WHERE {?ProductURI	rdfs:subClassOf	gr:ProductOrService}";
+				"SELECT ?Products WHERE {?Products	rdf:type	gr:SomeItems}";
 		
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -43,15 +43,13 @@ public class ProductServices {
 	}
 
 	//@GET
-	public String getProduct(String prodName) {
+	public String getProduct(String productID) {
 		auth.getAuthentication();
 
-		String q = "PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
+		String q = 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
 				"\r\n" + 
-				"DESCRIBE ?productURI\r\n" + 
-				"WHERE { ?productURI owl:sameAs pto:"+prodName+" }";
-
+				"DESCRIBE exp:"+productID+"";
 
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -78,18 +76,17 @@ public class ProductServices {
 			String description = newProduct.get(i).getDescription();
 
 			String queryUpdate = 
-					"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-							"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-							"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
-							"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+							"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+							"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+							"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+							"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 							"\r\n" + 
 							"INSERT DATA\r\n" + 
 							"{ \r\n" + 
-							"  <"+productURI+">    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-							"               	 owl:sameAs			pto:"+productID+";\r\n" + 
+							"  exp:"+productID+"	rdf:type	gr:SomeItems;\r\n" + 
 							"                	 gr:name	   		'"+name+"';\r\n" + 
-							"               	 gr:description		'"+description+"'	.\r\n" + 
-							"                \r\n" + 
+							"               	 gr:description		'"+description+"';\r\n" + 
+							"               	 foaf:page			<"+productURI+"> .\r\n" + 
 							"}";
 
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
@@ -108,27 +105,27 @@ public class ProductServices {
 		String name = newProduct.getName();
 		String description = newProduct.getDescription();
 
-		String queryUpdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX ex: <http://example.com/>\r\n" + 
-				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+		String queryUpdate = 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
-				"	{ ?productURL ?p ?s }\r\n" + 
+				"	{ exp:"+oldProductID+" ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"  ?productURL   ?p ?s; \r\n" + 
-				"                owl:sameAs		pto:"+oldProductID+"	.\r\n" + 
+				"  exp:"+oldProductID+"   ?p ?s; \r\n" + 
+				"                rdf:type	gr:SomeItems	.\r\n" + 
 				"                \r\n" + 
 				"};\r\n" + 
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  <"+productURI+">    rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"                owl:sameAs			pto:"+productID+";\r\n" + 
-				"                gr:name			'"+name+"';\r\n" + 
-				"                gr:description		'"+description+"'	.\r\n" + 
+				"  exp:"+productID+"	rdf:type	gr:SomeItems;\r\n" + 
+				"                	 gr:name	   		'"+name+"';\r\n" + 
+				"               	 gr:description		'"+description+"';\r\n" + 
+				"               	 foaf:page			<"+productURI+"> .\r\n" + 
 				"                \r\n" + 
 				"}";
 
@@ -142,20 +139,19 @@ public class ProductServices {
 		auth.getAuthentication();
 
 		String updateQuery = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX ex: <http://example.com/>\r\n" + 
-						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n"  +
-						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+						"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+						"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 						"\r\n" + 
 						"DELETE \r\n" + 
-						"	{ ?productURL ?p ?s }\r\n" + 
+						"	{ exp:"+productID+" ?p ?s }\r\n" + 
 						"WHERE\r\n" + 
 						"{ \r\n" + 
-						"  ?productURL   ?p ?s; \r\n" + 
-						"                owl:sameAs		pto:"+productID+"	.\r\n" + 
+						"  exp:"+productID+"   ?p ?s; \r\n" + 
+						"                rdf:type	gr:SomeItems	.\r\n" + 
 						"                \r\n" + 
-						"};";
+						"}";
 
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -167,19 +163,19 @@ public class ProductServices {
 	public void deleteAllProducts() {
 		auth.getAuthentication();
 		
-		String updateQuery = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+		String updateQuery = 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
-				"	{ ?productURL ?p ?s }\r\n" + 
+				"	{ ?Product ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"  ?productURL   ?p ?s; \r\n" + 
-				"                rdfs:subClassOf		gr:ProductOrService	.\r\n" + 
-				"                \r\n" + 
-				"}\r\n" + 
-				"\r\n" + 
-				"";
+				"  ?Product   ?p ?s; \r\n" + 
+				"             rdf:type	gr:SomeItems .\r\n" + 
+				"}";
 		
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

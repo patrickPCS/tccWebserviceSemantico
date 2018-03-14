@@ -17,48 +17,48 @@ import tcc.iff.rdf.webservice.RDFMediaType;
 import tcc.iff.rdf.webservice.model.Offer;
 import tcc.iff.rdf.webservice.services.OfferServices;
 
-@Path("/offers")
+@Path("/")
 public class OfferResources {
 	
 	OfferServices offerServ = new OfferServices();
 	@GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String listarProdutos() {		
-		return offerServ.getAllOffers();	
+    public String listarProdutos(@PathParam("CompanyID") String companyID) {		
+		return offerServ.getAllOffers(companyID);	
     }
 	
 	@DELETE
-	public Response deletarProdutos() {
-		offerServ.deleteAllOffers();
+	public Response deletarProdutos(@PathParam("CompanyID") String companyID) {
+		offerServ.deleteAllOffers(companyID);
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-		public Response adicionarProduto(List<Offer> OfferList) {
-		offerServ.addOffering(OfferList);
+		public Response adicionarProduto(@PathParam("CompanyID") String companyID, List<Offer> OfferList) {
+		offerServ.addOffering(companyID, OfferList);
 	   return Response.status(Response.Status.CREATED).build();
 	}
 	
 	@GET
 	@Path("/{OfferID}")
     @Produces(RDFMediaType.APPLICATION_JSON_LD)
-	public String lerProduto(@PathParam("OfferID") String offerID) {
-		return offerServ.getOffer(offerID);
+	public String lerProduto(@PathParam("CompanyID") String companyID, @PathParam("OfferID") String offerID) {
+		return offerServ.getOffer(companyID, offerID);
 	}
 	
 	@DELETE
 	@Path("/{OfferID}")
-	public Response deletarProduto(@PathParam("OfferID") String offerID) {
-		offerServ.deleteOffer(offerID);
+	public Response deletarProduto(@PathParam("CompanyID") String companyID, @PathParam("OfferID") String offerID) {
+		offerServ.deleteOffer(companyID, offerID);
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
 	@PUT
 	@Path("/{OfferID}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response alterarProduto(@PathParam("OfferID") String offerID, Offer updatedOffer) {
-		offerServ.updateOffering(offerID, updatedOffer);
+	public Response alterarProduto(@PathParam("CompanyID") String companyID, @PathParam("OfferID") String offerID, Offer updatedOffer) {
+		offerServ.updateOffering(companyID, offerID, updatedOffer);
 		return Response.status(Response.Status.CREATED).build();
 	}
 	

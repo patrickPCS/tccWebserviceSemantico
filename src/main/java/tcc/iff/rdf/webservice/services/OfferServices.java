@@ -23,16 +23,16 @@ public class OfferServices {
 	Authentication auth = new Authentication();	
 
 	//@GET All
-	public String getAllOffers() {
+	public String getAllOffers(String companyID) {
 		auth.getAuthentication();
 
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
 				"\r\n" + 
-				"SELECT ?offer\r\n" + 
+				"SELECT ?Offers\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?offer     rdf:type     gr:Offering    .\r\n" + 
+				"exco:"+companyID+"	gr:offers     ?Offers    .\r\n" + 
 				"}\r\n" + 
 				"";
 		
@@ -45,21 +45,11 @@ public class OfferServices {
 	}
 
 	//@GET
-	public String getOffer(String offerID) {
+	public String getOffer(String companyID, String offerID) {
 		auth.getAuthentication();
 
-		String q = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX exo: <http://example.com/Offering/>\r\n" + 
-				"\r\n" + 
-				"DESCRIBE ?offerURI\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				" ?offerURI      rdf:type     gr:Offering;\r\n" + 
-				"                      exo:offerID  '"+offerID+"' .\r\n" + 
-				"}\r\n" + 
-				"";
-
+		String q = 
+		"DESCRIBE <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/"+offerID+">\r\n";
 
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -73,34 +63,33 @@ public class OfferServices {
 	}
 
 	//@POST
-	public void addOffering(List<Offer> OfferList) {
+	public void addOffering(String companyID, List<Offer> OfferList) {
 		auth.getAuthentication();
 
 		int TAM;
 		TAM = OfferList.size();
 		for(int i=0; i<TAM; i++) {
 			
-			String offerID = OfferList.get(i).getOfferID();
 			String offerURI = OfferList.get(i).getOfferURI();
 			String productID = OfferList.get(i).getIncludes();
 			String validFrom = OfferList.get(i).getValidFrom();
 			String validThrough = OfferList.get(i).getValidThrough();
 			String hasCurrency = OfferList.get(i).getHasCurrency();
 			String price = OfferList.get(i).getPrice();
-
 			String queryUpdate = 
 					"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-					"PREFIX ex: <http://example.com/>\r\n" + 
+					"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+					"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
+					"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
 					"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 					"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
-					"PREFIX exo: <http://example.com/Offering/>\r\n" + 
 					"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 					"\r\n" + 
 					"INSERT DATA\r\n" + 
 					"{ \r\n" + 
-					"  <"+offerURI+">	rdf:type		gr:Offering;\r\n" + 
-					"                        gr:includes      '"+productID+"';\r\n" + 
-					"                        exo:offerID      '"+offerID+"';\r\n" + 
+					"  exo:"+productID+"	rdf:type		gr:Offering;\r\n" + 
+					"                        gr:includes      exp:"+productID+";\r\n" + 
+					"	gr:BusinessEntity     exco:"+companyID+";\r\n" + 
 					"	foaf:page     <"+offerURI+">;\r\n" + 
 					"	gr:hasBusinessFunction gr:Sell ;\r\n" + 
 					"	gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
@@ -109,7 +98,8 @@ public class OfferServices {
 					"         [ a gr:UnitPriceSpecification ;\r\n" + 
 					"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
 					"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
-					"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" + 
+					"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
+					"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 					"}";
 
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
@@ -119,11 +109,10 @@ public class OfferServices {
 	}
 
 	//@PUT
-	public void updateOffering(String oldOfferID, Offer updatedOffer) {
+	public void updateOffering(String companyID, String oldOfferID, Offer updatedOffer) {
 
 		auth.getAuthentication();
 
-		String offerID = updatedOffer.getOfferID();
 		String offerURI = updatedOffer.getOfferURI();
 		String productID = updatedOffer.getIncludes();
 		String validFrom = updatedOffer.getValidFrom();
@@ -133,25 +122,26 @@ public class OfferServices {
 
 		String queryUpdate = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX ex: <http://example.com/>\r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
 				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
-				"PREFIX exo: <http://example.com/Offering/>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
-				"	{ ?offerURI ?p ?s }\r\n" + 
+				"	{ exo:"+oldOfferID+" ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"  ?offerURI ?p ?s; \r\n" + 
-				"                exo:offerID		'"+oldOfferID+"'	.\r\n" + 
+				"  exo:"+oldOfferID+" ?p ?s;\r\n" + 
+				" 		rdf:type gr:Offering .\r\n" + 
 				"};\r\n" + 
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  <"+offerURI+">	rdf:type		gr:Offering;\r\n" + 
-				"                        gr:includes      '"+productID+"';\r\n" + 
-				"                        exo:offerID      '"+offerID+"';\r\n" + 
+				"  exo:"+productID+"	rdf:type		gr:Offering;\r\n" + 
+				"                        gr:includes      exp:"+productID+";\r\n" + 
+				"	gr:BusinessEntity     exco:"+companyID+";\r\n" + 
 				"	foaf:page     <"+offerURI+">;\r\n" + 
 				"	gr:hasBusinessFunction gr:Sell ;\r\n" + 
 				"	gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
@@ -160,7 +150,8 @@ public class OfferServices {
 				"         [ a gr:UnitPriceSpecification ;\r\n" + 
 				"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
 				"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
-				"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" + 
+				"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
+				"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 				"}";
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
@@ -169,22 +160,28 @@ public class OfferServices {
 	}
 
 	//DELETE
-	public void deleteOffer(String offerID) {
+	public void deleteOffer(String companyID, String offerID) {
 		auth.getAuthentication();
 
 		String updateQuery = 
-				"PREFIX exo: <http://example.com/Offering/>\r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
-				"	{ ?offerURI ?p ?s }\r\n" + 
+				"	{ exo:"+offerID+" ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"  ?offerURI ?p ?s; \r\n" + 
-				"                exo:offerID		'"+offerID+"'	.\r\n" + 
-				"}\r\n" + 
-				"";
+				"  exo:"+offerID+" ?p ?s;\r\n" +
+				" 		rdf:type gr:Offering .\r\n" + 
+				"};\r\n" + 
+				"\r\n" + 
+				"DELETE {exco:"+companyID+"	gr:offers     exo:"+offerID+" }\r\n" + 
+				"WHERE\r\n" + 
+				"{\r\n" + 
+				"exco:"+companyID+"	gr:offers     exo:"+offerID+"    .\r\n" +
+				"}";
 
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -193,19 +190,30 @@ public class OfferServices {
 	}
 	
 	//DELETE ALL 
-	public void deleteAllOffers() {
+	public void deleteAllOffers(String companyID) {
 		auth.getAuthentication();
 		
-		String updateQuery = "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+		String updateQuery = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 				"\r\n" + 
-				"DELETE\r\n" + 
-				"{ ?offering ?p ?s }\r\n" + 
+				"DELETE {exco:"+companyID+"	gr:offers     ?Offers }\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?offering ?p ?s;\r\n" + 
-				"rdf:type  gr:Offering .\r\n" + 
-				"}";
+				"exco:"+companyID+"	gr:offers     ?Offers    .\r\n" +
+				"};\r\n" + 
+				
+				"\r\n" + 
+				"DELETE {?Offer	?p     ?o }\r\n" + 
+				"WHERE\r\n" + 
+				"{\r\n" + 
+				"?Offer	?p     ?o;"
+				+ "		gr:BusinessEntity	exco:"+companyID+" .\r\n" +
+				"}\r\n" + 
+				"";
+		
+		
 		
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

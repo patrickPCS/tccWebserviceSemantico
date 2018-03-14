@@ -61,4 +61,9 @@ public class CompanyResources {
 		cp.updateCompany(companyID, newCompany);
 		return Response.status(Response.Status.CREATED).build();
 	}
+	
+	@Path("/{CompanyID}/offers")
+	public OfferResources getOfferResources() {
+		return new OfferResources();
+	}
 }

@@ -12,7 +12,14 @@ public class Offer {
 	private String validThrough; //valido até
 	private String hasCurrency; //moeda (USD, BRL)
 	private String price;	// ex.: 19.90
+	private String companyID; 
 	
+	public String getCompanyID() {
+		return companyID;
+	}
+	public void setCompanyID(String companyID) {
+		this.companyID = companyID;
+	}
 	public String getOfferID() {
 		return offerID;
 	}
