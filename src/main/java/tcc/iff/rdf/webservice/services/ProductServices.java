@@ -181,4 +181,25 @@ public class ProductServices {
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
 	}
+
+	public String getOffersToProducts(String productID) {
+		auth.getAuthentication();
+
+		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+				"\r\n" + 
+				"SELECT ?Companies	?Prices \r\n" + 
+				"WHERE { ?Companies 			gr:includes		exp:"+productID+";\r\n" + 
+				"      						gr:hasPriceSpecification\r\n" + 
+				"				        [rdf:type gr:UnitPriceSpecification ;\r\n" + 
+				"				           gr:hasCurrencyValue		?Prices ]}\r\n" + 
+				"ORDER BY(?Prices)";
+		
+		Query query = QueryFactory.create(querySelect);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+
+		ResultSet results = qexec.execSelect();
+		return ResultSetFormatter.asText(results);
+
+	}
 }

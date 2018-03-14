@@ -63,7 +63,7 @@ public class CompanyResources {
 	}
 	
 	@Path("/{CompanyID}/offers")
-	public OfferResources getOfferResources() {
-		return new OfferResources();
+	public CompanyOfferResources getOfferResources() {
+		return new CompanyOfferResources();
 	}
 }

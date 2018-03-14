@@ -27,6 +27,13 @@ public class ProductResources {
 		return prodServ.getAllProducts();		
     }
 	
+	@GET
+	@Path("/{ProductID}/offers")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String listarOfertasParaProdutos(@PathParam("ProductID") String productID) {		
+		return prodServ.getOffersToProducts(productID);		
+    }
+	
 	@DELETE
 	public Response deletarProdutos() {
 		prodServ.deleteAllProducts();
