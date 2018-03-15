@@ -68,13 +68,12 @@ public class CompanyServices {
 		String q = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX exco: <http://example.com/Company/>\r\n" + 
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 				"\r\n" + 
-				"DESCRIBE ?companyURL\r\n" + 
+				"DESCRIBE exco:"+companyID+"\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?companyURL rdf:type gr:BusinessEntity;\r\n" + 
-				"                     exco:companyID    '"+companyID+"' .\r\n" + 
+				"exco:"+companyID+" rdf:type gr:BusinessEntity  .\r\n" + 
 				"}\r\n" + 
 				"";
 
@@ -107,17 +106,16 @@ public class CompanyServices {
 							"PREFIX ex: <http://example.com/>\r\n" + 
 							"PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\r\n" + 
 							"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-							"PREFIX exco: <http://example.com/Company/>\r\n" + 
+							"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 							"\r\n" + 
 							"\r\n" + 
 							"INSERT DATA\r\n" + 
 							"{ \r\n" + 
-							"  <"+companyURL+"> 	rdf:type		gr:BusinessEntity;\r\n" + 
+							"  exco:"+companyID+" 	rdf:type		gr:BusinessEntity;\r\n" + 
 							"                vcard:hasURL	<"+companyURL+">;\r\n" + 
 							"                vcard:hasEmail	<"+email+">;\r\n" + 
 							"                ex:catalogURI	<"+catalogURI+">;\r\n" + 
-							"                gr:legalName	'"+legalName+"';\r\n" + 
-							"                exco:companyID          '"+companyID+"'  .           \r\n" + 
+							"                gr:legalName	'"+legalName+"'   .           \r\n" + 
 							"}";
 	
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
@@ -141,7 +139,7 @@ public class CompanyServices {
 			"PREFIX ex: <http://example.com/>\r\n" + 
 			"PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\r\n" + 
 			"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-			"PREFIX exco: <http://example.com/Company/>\r\n" + 
+			"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 			"\r\n" + 
 			"DELETE \r\n" + 
 			"	{ ?companyURL ?p ?s }\r\n" + 
@@ -153,12 +151,11 @@ public class CompanyServices {
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  <"+companyURL+"> 	rdf:type		gr:BusinessEntity;\r\n" + 
+				"  exco:"+companyID+" 	rdf:type		gr:BusinessEntity;\r\n" + 
 				"                vcard:hasURL	<"+companyURL+">;\r\n" + 
 				"                vcard:hasEmail	<"+email+">;\r\n" + 
 				"                ex:catalogURI	<"+catalogURI+">;\r\n" + 
-				"                gr:legalName	'"+legalName+"';\r\n" + 
-				"                exco:companyID          '"+companyID+"'  .           \r\n" + 
+				"                gr:legalName	'"+legalName+"' .\r\n" + 
 				"}";
 	
 	UpdateRequest request = UpdateFactory.create(queryUpdate);
@@ -171,16 +168,15 @@ public class CompanyServices {
 		auth.getAuthentication();
 
 		String updateQuery = 
-						"PREFIX exco: <http://example.com/Company/>\r\n" + 
+						"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 						"\r\n" + 
 						"DELETE \r\n" + 
-						"	{ ?companyURL ?p ?s }\r\n" + 
+						"	{ exco:"+companyID+" ?p ?s }\r\n" + 
 						"WHERE\r\n" + 
 						"{ \r\n" + 
-						"  ?companyURL ?p ?s; \r\n" + 
-						"                exco:companyID		'"+companyID+"'	.\r\n" + 
+						"  exco:"+companyID+" ?p ?s; .\r\n" + 
 						"}\r\n" + 
 						"";
 

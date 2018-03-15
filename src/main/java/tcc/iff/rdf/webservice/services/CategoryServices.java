@@ -63,7 +63,8 @@ public class CategoryServices {
 	public String getCategory(String catName) {
 		auth.getAuthentication();
 
-		String q = "PREFIX exc: <http://example.com/Category/>\r\n" + 
+		String q = 
+				"PREFIX exc: <http://localhost:8080/webservice/webapi/categories/>\r\n" + 
 				"PREFIX ex: <http://example.com/>\r\n" +
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 				"\r\n" + 
@@ -96,7 +97,7 @@ public class CategoryServices {
 	
 			String queryUpdate = 
 							"PREFIX ex: <http://example.com/>\r\n" + 
-							"PREFIX exc: <http://example.com/Category/>\r\n" + 
+							"PREFIX exc: <http://localhost:8080/webservice/webapi/categories/>\r\n" + 
 							"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 							"\r\n" + 
 							"INSERT DATA\r\n" + 
@@ -118,7 +119,8 @@ public class CategoryServices {
 	String name = newCat.getName();
 	String id = newCat.getId();
 
-	String queryUpdate = "PREFIX exc: <http://example.com/Category/>\r\n" + 
+	String queryUpdate = 
+			"PREFIX exc: <http://localhost:8080/webservice/webapi/categories/>\r\n" + 
 			"PREFIX ex: <http://example.com/>\r\n" + 
 			"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 			"\r\n" + 
@@ -149,7 +151,7 @@ public class CategoryServices {
 		auth.getAuthentication();
 
 		String updateQuery = 
-						"PREFIX exc: <http://example.com/Category/>\r\n" + 
+						"PREFIX exc: <http://localhost:8080/webservice/webapi/categories/>\r\n" + 
 						"PREFIX ex: <http://example.com/>\r\n" + 
 						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 						"\r\n" + 
