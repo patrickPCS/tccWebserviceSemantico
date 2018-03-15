@@ -22,8 +22,8 @@ public class CompanyOfferResources {
 	
 	CompanyOfferServices offerServ = new CompanyOfferServices();
 	@GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String listarProdutos(@PathParam("CompanyID") String companyID) {		
+    @Produces(MediaType.APPLICATION_JSON)
+    public String listarOfertas(@PathParam("CompanyID") String companyID) {		
 		return offerServ.getAllOffers(companyID);	
     }
 	

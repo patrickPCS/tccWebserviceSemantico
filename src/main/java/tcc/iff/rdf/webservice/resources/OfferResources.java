@@ -14,7 +14,7 @@ public class OfferResources {
 	
 	OfferServices offerServ = new OfferServices();
 	@GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String listarOfertas() {		
 		return offerServ.getAllOffers();	
     }
@@ -23,8 +23,5 @@ public class OfferResources {
 	public Response deletarOfertas() {
 		offerServ.deleteAllOffers();
 		return Response.status(Response.Status.NO_CONTENT).build();
-	}
-	
-	//offertas para um determinado produto
-	
+	}	
 }

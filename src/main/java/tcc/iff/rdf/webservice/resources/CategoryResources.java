@@ -21,7 +21,7 @@ public class CategoryResources {
 	
 		CategoryServices catServ = new CategoryServices();
 		@GET
-	    @Produces(MediaType.TEXT_PLAIN)
+	    @Produces(MediaType.APPLICATION_JSON)
 	    public String listarCategorias() {		
 			return catServ.getAllCategories();		
 	    }
@@ -60,8 +60,4 @@ public class CategoryResources {
 			catServ.updateCategory(catID, newCategory);
 			return Response.status(Response.Status.CREATED).build();
 		}
-		
-	
-
-
 }

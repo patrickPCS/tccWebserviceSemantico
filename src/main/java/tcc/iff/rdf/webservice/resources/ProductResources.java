@@ -22,14 +22,14 @@ public class ProductResources {
 	
 	ProductServices prodServ = new ProductServices();
 	@GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String listarProdutos() {		
 		return prodServ.getAllProducts();		
     }
 	
 	@GET
 	@Path("/{ProductID}/offers")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String listarOfertasParaProdutos(@PathParam("ProductID") String productID) {		
 		return prodServ.getOffersToProducts(productID);		
     }

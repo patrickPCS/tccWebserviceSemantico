@@ -8,7 +8,6 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
@@ -16,6 +15,10 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import tcc.iff.rdf.webservice.connection.Authentication;
 import tcc.iff.rdf.webservice.model.Offer;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonWriter;
 
 public class CompanyOfferServices {
 
@@ -40,8 +43,19 @@ public class CompanyOfferServices {
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
 		ResultSet results = qexec.execSelect();
-		return ResultSetFormatter.asText(results);
+		
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		String c = "Offers";
+		while(results.hasNext()) {
+		jsonArrayAdd.add(results.nextSolution().getResource(c).getURI());
+		}
+		JsonArray ja = jsonArrayAdd.build();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		JsonWriter writer = Json.createWriter(outputStream);
+		writer.writeArray(ja);
+		String output = new String(outputStream.toByteArray());
 
+		return output;
 	}
 
 	//@GET
@@ -97,7 +111,7 @@ public class CompanyOfferServices {
 					"	gr:hasPriceSpecification\r\n" + 
 					"         [ a gr:UnitPriceSpecification ;\r\n" + 
 					"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-					"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
+					"           gr:hasCurrencyValue '"+price+"' ;\r\n" + 
 					"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
 					"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 					"}";
@@ -149,7 +163,7 @@ public class CompanyOfferServices {
 				"	gr:hasPriceSpecification\r\n" + 
 				"         [ rdf:type gr:UnitPriceSpecification ;\r\n" + 
 				"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-				"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
+				"           gr:hasCurrencyValue '"+price+"'^^xsd:decimal ;\r\n" + 
 				"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
 				"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 				"}";

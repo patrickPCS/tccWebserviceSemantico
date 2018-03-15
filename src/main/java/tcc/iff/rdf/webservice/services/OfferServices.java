@@ -1,11 +1,17 @@
 package tcc.iff.rdf.webservice.services;
 
+import java.io.ByteArrayOutputStream;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonWriter;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -35,8 +41,18 @@ public class OfferServices {
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
 		ResultSet results = qexec.execSelect();
-		return ResultSetFormatter.asText(results);
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		String o = "Offers";
+		while(results.hasNext()) {
+		jsonArrayAdd.add(results.nextSolution().getResource(o).getURI());
+		}
+		JsonArray ja = jsonArrayAdd.build();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		JsonWriter writer = Json.createWriter(outputStream);
+		writer.writeArray(ja);
+		String output = new String(outputStream.toByteArray());
 
+		return output;
 	}
 	
 	//DELETE ALL 

@@ -22,7 +22,7 @@ public class CompanyResources {
 	
 	CompanyServices cp = new CompanyServices();
 	@GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String listarEmpresas() {		
 		return cp.getAllCompanies();		
     }
