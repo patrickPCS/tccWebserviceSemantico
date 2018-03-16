@@ -111,7 +111,7 @@ public class CompanyOfferServices {
 					"	gr:hasPriceSpecification\r\n" + 
 					"         [ a gr:UnitPriceSpecification ;\r\n" + 
 					"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-					"           gr:hasCurrencyValue '"+price+"' ;\r\n" + 
+					"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
 					"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
 					"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 					"}";
@@ -163,7 +163,7 @@ public class CompanyOfferServices {
 				"	gr:hasPriceSpecification\r\n" + 
 				"         [ rdf:type gr:UnitPriceSpecification ;\r\n" + 
 				"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-				"           gr:hasCurrencyValue '"+price+"'^^xsd:decimal ;\r\n" + 
+				"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
 				"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
 				"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 				"}";
