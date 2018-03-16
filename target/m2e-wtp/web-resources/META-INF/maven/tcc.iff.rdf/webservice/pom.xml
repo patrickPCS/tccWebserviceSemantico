@@ -6,7 +6,7 @@
     <groupId>tcc.iff.rdf</groupId>
     <artifactId>webservice</artifactId>
     <packaging>war</packaging>
-    <version>6.0</version>
+    <version>v1.6</version>
     <name>webservice</name>
 
     <build>
