@@ -94,7 +94,7 @@ public class CompanyOfferServices {
 					"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 					"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
 					"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-					"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+					"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
 					"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 					"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
 					"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
@@ -111,7 +111,7 @@ public class CompanyOfferServices {
 					"	gr:hasPriceSpecification\r\n" + 
 					"         [ a gr:UnitPriceSpecification ;\r\n" + 
 					"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-					"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
+					"           gr:hasCurrencyValue '"+price+"'^^xsd:float;\r\n" + 
 					"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
 					"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
 					"}";

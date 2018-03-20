@@ -83,7 +83,7 @@ public class CompanyServices {
 
 		Model results = qexec.execDescribe();	
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		results.write(outputStream, "JSON-LD");
+		results.write(outputStream, "RDF/JSON");
 		String output = new String(outputStream.toByteArray());
 
 		return output;
