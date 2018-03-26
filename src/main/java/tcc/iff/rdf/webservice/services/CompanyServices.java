@@ -163,8 +163,10 @@ public class CompanyServices {
 			}
 
 	//PUT
-	public void updateCompany(String oldCompanyID, Company newCompany) {
+	public Response updateCompany(String oldCompanyID, Company newCompany) {
 	auth.getAuthentication();
+	
+	String exco = "http://localhost:8080/webservice/webapi/companies/";
 	
 	String companyID = newCompany.getCompanyID();
 	String companyURL = newCompany.getCompanyURL();
@@ -173,19 +175,19 @@ public class CompanyServices {
 	String catalogURI = newCompany.getCatalogURI();
 
 	String queryUpdate = 
-			"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-			"PREFIX ex: <http://example.com/>\r\n" + 
-			"PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\r\n" + 
-			"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-			"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-			"\r\n" + 
-			"DELETE \r\n" + 
-			"	{ ?companyURL ?p ?s }\r\n" + 
-			"WHERE\r\n" + 
-			"{ \r\n" + 
-			"  ?companyURL ?p ?s; \r\n" + 
-			"                exco:companyID		'"+oldCompanyID+"'	.\r\n" + 
-			"};\r\n" + 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX ex: <http://example.com/>\r\n" + 
+				"PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
+				"\r\n" + 
+				"DELETE\r\n" + 
+				"{ exco:"+oldCompanyID+" ?p ?s }\r\n" + 
+				"WHERE\r\n" + 
+				"{\r\n" + 
+				"exco:"+oldCompanyID+" ?p ?s;\r\n" + 
+				"rdf:type  gr:BusinessEntity .\r\n" + 
+				"};"+
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
@@ -199,6 +201,17 @@ public class CompanyServices {
 	UpdateRequest request = UpdateFactory.create(queryUpdate);
 	UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 	up.execute();
+	
+	JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+	jsonArrayAdd.add(exco+companyID);
+	JsonArray ja = jsonArrayAdd.build();
+	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	JsonWriter writer = Json.createWriter(outputStream);
+	writer.writeArray(ja);
+	String output = new String(outputStream.toByteArray());
+	return Response.status(Response.Status.CREATED)
+			.entity(output)
+			.build();	
 	}
 
 	//DELETE

@@ -177,9 +177,11 @@ public class ProductTypesServices {
 		}
 
 	//@PUT
-	public void updateProductType(String oldProductID, ProductType newProductType) {
+	public Response updateProductType(String oldProductID, ProductType newProductType) {
 
 		auth.getAuthentication();
+		
+		String exp = "http://localhost:8080/webservice/webapi/producttypes/";
 		
 		String id = newProductType.getId();
 		String label = newProductType.getLabel();
@@ -222,6 +224,17 @@ public class ProductTypesServices {
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
+		
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		jsonArrayAdd.add(exp+id);
+		JsonArray ja = jsonArrayAdd.build();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		JsonWriter writer = Json.createWriter(outputStream);
+		writer.writeArray(ja);
+		String output = new String(outputStream.toByteArray());
+		return Response.status(Response.Status.CREATED)
+				.entity(output)
+				.build();	
 	}
 
 	//DELETE

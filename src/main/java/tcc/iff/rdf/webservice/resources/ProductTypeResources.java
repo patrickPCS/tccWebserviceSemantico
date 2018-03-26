@@ -64,9 +64,9 @@ public class ProductTypeResources {
 	@PUT
 	@Path("/{ProductID}")
 	@Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
 	public Response alterarProduto(@PathParam("ProductID") String prodID, ProductType newProduct) {
-		prodServ.updateProductType(prodID, newProduct);
-		return Response.status(Response.Status.CREATED).build();
+		return prodServ.updateProductType(prodID, newProduct);
 	}
 	
 }

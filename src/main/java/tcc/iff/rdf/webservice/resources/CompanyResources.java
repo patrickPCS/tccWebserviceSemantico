@@ -57,9 +57,9 @@ public class CompanyResources {
 	@PUT
 	@Path("/{CompanyID}")
 	@Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
 	public Response alterarEmpresa(@PathParam("CompanyID") String companyID, Company newCompany) {
-		cp.updateCompany(companyID, newCompany);
-		return Response.status(Response.Status.CREATED).build();
+		return cp.updateCompany(companyID, newCompany);
 	}
 	
 	@Path("/{CompanyID}/offers")

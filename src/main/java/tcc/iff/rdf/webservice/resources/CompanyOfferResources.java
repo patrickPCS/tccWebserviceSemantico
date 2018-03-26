@@ -57,9 +57,9 @@ public class CompanyOfferResources {
 	@PUT
 	@Path("/{OfferID}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response alterarProduto(@PathParam("CompanyID") String companyID, @PathParam("OfferID") String offerID, Offer updatedOffer) {
-		offerServ.updateOffering(companyID, offerID, updatedOffer);
-		return Response.status(Response.Status.CREATED).build();
+		return offerServ.updateOffering(companyID, offerID, updatedOffer);
 	}
 	
 }

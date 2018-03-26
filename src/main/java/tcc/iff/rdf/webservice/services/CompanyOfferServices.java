@@ -19,6 +19,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonWriter;
+
 import javax.ws.rs.core.Response;
 
 public class CompanyOfferServices {
@@ -164,10 +165,12 @@ public class CompanyOfferServices {
 	}
 
 	//@PUT
-	public void updateOffering(String companyID, String oldOfferID, Offer updatedOffer) {
+	public Response updateOffering(String companyID, String oldOfferID, Offer updatedOffer) {
 
 		auth.getAuthentication();
-
+		
+		String exo = "http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/";
+		
 		String offerURI = updatedOffer.getOfferURI();
 		String productID = updatedOffer.getIncludes();
 		String validFrom = updatedOffer.getValidFrom();
@@ -212,6 +215,17 @@ public class CompanyOfferServices {
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
+		
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		jsonArrayAdd.add(exo+productID);
+		JsonArray ja = jsonArrayAdd.build();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		JsonWriter writer = Json.createWriter(outputStream);
+		writer.writeArray(ja);
+		String output = new String(outputStream.toByteArray());
+		return Response.status(Response.Status.CREATED)
+				.entity(output)
+				.build();	
 	}
 
 	//DELETE
