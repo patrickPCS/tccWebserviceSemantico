@@ -20,6 +20,8 @@ import tcc.iff.rdf.webservice.services.ProductTypesServices;
 @Path("/producttypes")
 public class ProductTypeResources {
 	
+	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
+	
 	ProductTypesServices prodServ = new ProductTypesServices();
 	@GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -44,14 +46,7 @@ public class ProductTypeResources {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 		public Response adicionarProduto(List<ProductType> ProductList) {
-	    return Response.status(Response.Status.CREATED).
-	    		entity(prodServ.addProductType(ProductList))
-	    		.build();
-			/*
-			return Response.status(Response.Status.CONFLICT)
-					.entity("One or more resources that you are trying to create already exists.")
-					.build();
-		    		*/
+		return prodServ.addProductType(ProductList);
 	}
 	
 	@GET

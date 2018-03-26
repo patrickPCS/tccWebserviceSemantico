@@ -1,12 +1,14 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonWriter;
+import javax.ws.rs.core.Response;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -96,7 +98,7 @@ public class ProductTypesServices {
 	}
 
 	//@POST
-	public String addProductType(List<ProductType> newProductType) {
+	public Response addProductType(List<ProductType> newProductType) {
 		auth.getAuthentication();
 
 		int TAM;
@@ -157,13 +159,12 @@ public class ProductTypesServices {
 			}else
 			{
 				String message = "CONFLICT: the ProductType "+id+" already exists: "+exp+id;
-				
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				String output = new String(outputStream.toByteArray());
 				output = message;
-				
-				return output;
-			
+				return Response.status(Response.Status.CONFLICT)
+						.entity(output)
+						.build();
 			}
 		}
 		JsonArray ja = jsonArrayAdd.build();
@@ -171,8 +172,9 @@ public class ProductTypesServices {
 		JsonWriter writer = Json.createWriter(outputStream);
 		writer.writeArray(ja);
 		String output = new String(outputStream.toByteArray());
-		return output;
-	}
+		return Response.status(Response.Status.CREATED).
+				entity(output)
+				.build();	}
 
 	//@PUT
 	public void updateProductType(String oldProductID, ProductType newProductType) {
