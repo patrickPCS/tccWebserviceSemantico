@@ -43,8 +43,9 @@ public class ProductTypeResources {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 		public Response adicionarProduto(List<ProductType> ProductList) {
-		prodServ.addProductType(ProductList);
-	   return Response.status(Response.Status.CREATED).build();
+	    return Response.status(201).
+	    		entity(prodServ.addProductType(ProductList))
+	    		.build();
 	}
 	
 	@GET

@@ -96,11 +96,13 @@ public class ProductTypesServices {
 	}
 
 	//@POST
-	public void addProductType(List<ProductType> newProductType) {
+	public String addProductType(List<ProductType> newProductType) {
 		auth.getAuthentication();
 
 		int TAM;
 		TAM = newProductType.size();
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		String exp = "http://localhost:8080/webservice/webapi/producttypes/";
 		for(int i=0; i<TAM; i++) {
 			
 			String id = newProductType.get(i).getId();
@@ -136,7 +138,16 @@ public class ProductTypesServices {
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 			up.execute();
+			
+			jsonArrayAdd.add(exp+id);
+			
 		}
+		JsonArray ja = jsonArrayAdd.build();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		JsonWriter writer = Json.createWriter(outputStream);
+		writer.writeArray(ja);
+		String output = new String(outputStream.toByteArray());
+		return output;
 	}
 
 	//@PUT

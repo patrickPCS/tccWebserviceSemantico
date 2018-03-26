@@ -90,10 +90,12 @@ public class CompanyServices {
 	}
 
 	//POST
-	public void addCompany(List<Company> companyList) {
+	public String addCompany(List<Company> companyList) {
 		auth.getAuthentication();
 		int TAM;
 		TAM = companyList.size();
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		String exco = "http://localhost:8080/webservice/webapi/companies/";
 		for(int i=0; i<TAM; i++) {
 			String companyID = companyList.get(i).getCompanyID();
 			String companyURL = companyList.get(i).getCompanyURL();
@@ -121,7 +123,16 @@ public class CompanyServices {
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 			up.execute();
-		}
+			
+			jsonArrayAdd.add(exco+companyID);
+			
+			}
+			JsonArray ja = jsonArrayAdd.build();
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			JsonWriter writer = Json.createWriter(outputStream);
+			writer.writeArray(ja);
+			String output = new String(outputStream.toByteArray());
+			return output;
 	}
 
 	//PUT

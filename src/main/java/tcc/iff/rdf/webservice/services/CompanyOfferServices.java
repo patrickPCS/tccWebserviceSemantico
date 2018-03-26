@@ -77,11 +77,13 @@ public class CompanyOfferServices {
 	}
 
 	//@POST
-	public void addOffering(String companyID, List<Offer> OfferList) {
+	public String addOffering(String companyID, List<Offer> OfferList) {
 		auth.getAuthentication();
 
 		int TAM;
 		TAM = OfferList.size();
+		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
+		String exo = "http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/";
 		for(int i=0; i<TAM; i++) {
 			
 			String offerURI = OfferList.get(i).getOfferURI();
@@ -119,7 +121,16 @@ public class CompanyOfferServices {
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 			up.execute();
-		}
+		
+			jsonArrayAdd.add(exo+productID);
+			
+			}
+			JsonArray ja = jsonArrayAdd.build();
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			JsonWriter writer = Json.createWriter(outputStream);
+			writer.writeArray(ja);
+			String output = new String(outputStream.toByteArray());
+			return output;
 	}
 
 	//@PUT

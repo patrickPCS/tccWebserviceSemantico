@@ -36,8 +36,10 @@ public class CompanyResources {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 		public Response adicionarEmpresa(List<Company> companyList) {
-		cp.addCompany(companyList);
-	   return Response.status(Response.Status.CREATED).build();
+		
+	   return Response.status(Response.Status.CREATED)
+			   .entity(cp.addCompany(companyList))
+			   .build();
 	}
 	
 	@GET
