@@ -42,10 +42,16 @@ public class ProductTypeResources {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 		public Response adicionarProduto(List<ProductType> ProductList) {
-	    return Response.status(201).
+	    return Response.status(Response.Status.CREATED).
 	    		entity(prodServ.addProductType(ProductList))
 	    		.build();
+			/*
+			return Response.status(Response.Status.CONFLICT)
+					.entity("One or more resources that you are trying to create already exists.")
+					.build();
+		    		*/
 	}
 	
 	@GET

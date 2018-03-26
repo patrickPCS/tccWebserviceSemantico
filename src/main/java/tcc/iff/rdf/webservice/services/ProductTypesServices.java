@@ -111,36 +111,60 @@ public class ProductTypesServices {
 			String description = newProductType.get(i).getDescription();
 			String language = newProductType.get(i).getLanguage();
 			
-			String queryUpdate = 
-							"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-							"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-							"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-							"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
-							"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
-							"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
-							"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
-							"\r\n" + 
-							"\r\n" + 
-							"INSERT DATA\r\n" + 
-							"{ \r\n" + 
-							"  exp:"+id+"	  	 rdf:type			owl:Class;\r\n" + 
-							"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-							"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
-							"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
-							"			 rdfs:label			'"+label+"';\r\n" + 
-							"			 foaf:homepage			'"+homepage+"';\r\n" + 
-							"			 gr:description			'"+description+"';\r\n" + 
-							"			 lang:namespacelang		'"+language+"' .\r\n" + 
-							"			\r\n" + 
-							"}		\r\n" + 
-							"";
+			String queryDescribe = "PREFIX pto: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+					"\r\n" + 
+					"DESCRIBE pto:"+id+"\r\n" + 
+					"WHERE\r\n" + 
+					"{\r\n" + 
+					"pto:"+id+" ?p ?o .\r\n" + 
+					"}";
+			
+			Query query = QueryFactory.create(queryDescribe);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
-			UpdateRequest request = UpdateFactory.create(queryUpdate);
-			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
-			up.execute();
+			Model results = qexec.execDescribe();
+			if (results.isEmpty()) {
+				String queryUpdate = 
+								"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+								"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+								"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+								"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
+								"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
+								"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
+								"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+								"\r\n" + 
+								"\r\n" + 
+								"INSERT DATA\r\n" + 
+								"{ \r\n" + 
+								"  exp:"+id+"	  	 rdf:type			owl:Class;\r\n" + 
+								"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+								"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
+								"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
+								"			 rdfs:label			'"+label+"';\r\n" + 
+								"			 foaf:homepage			'"+homepage+"';\r\n" + 
+								"			 gr:description			'"+description+"';\r\n" + 
+								"			 lang:namespacelang		'"+language+"' .\r\n" + 
+								"			\r\n" + 
+								"}		\r\n" + 
+								"";
+	
+				UpdateRequest request = UpdateFactory.create(queryUpdate);
+				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
+				up.execute();
+				
+				jsonArrayAdd.add(exp+id);
+				
+			}else
+			{
+				String message = "CONFLICT: the ProductType "+id+" already exists: "+exp+id;
+				
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+				String output = new String(outputStream.toByteArray());
+				output = message;
+				
+				return output;
 			
-			jsonArrayAdd.add(exp+id);
-			
+			}
 		}
 		JsonArray ja = jsonArrayAdd.build();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
