@@ -1,7 +1,6 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.Json;
@@ -174,7 +173,8 @@ public class ProductTypesServices {
 		String output = new String(outputStream.toByteArray());
 		return Response.status(Response.Status.CREATED).
 				entity(output)
-				.build();	}
+				.build();	
+		}
 
 	//@PUT
 	public void updateProductType(String oldProductID, ProductType newProductType) {

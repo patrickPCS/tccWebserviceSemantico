@@ -35,10 +35,9 @@ public class CompanyOfferResources {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 		public Response adicionarProduto(@PathParam("CompanyID") String companyID, List<Offer> OfferList) {
-	   return Response.status(201).
-			   entity(offerServ.addOffering(companyID, OfferList))
-			   .build();
+		   return offerServ.addOffering(companyID, OfferList);
 	}
 	
 	@GET

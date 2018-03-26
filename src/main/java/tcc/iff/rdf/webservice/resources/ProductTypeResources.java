@@ -19,9 +19,7 @@ import tcc.iff.rdf.webservice.services.ProductTypesServices;
 
 @Path("/producttypes")
 public class ProductTypeResources {
-	
-	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
-	
+		
 	ProductTypesServices prodServ = new ProductTypesServices();
 	@GET
     @Produces(MediaType.APPLICATION_JSON)

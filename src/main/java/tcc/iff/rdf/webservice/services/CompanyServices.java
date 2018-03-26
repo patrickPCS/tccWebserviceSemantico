@@ -7,6 +7,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonWriter;
+import javax.ws.rs.core.Response;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -90,7 +91,7 @@ public class CompanyServices {
 	}
 
 	//POST
-	public String addCompany(List<Company> companyList) {
+	public Response addCompany(List<Company> companyList) {
 		auth.getAuthentication();
 		int TAM;
 		TAM = companyList.size();
@@ -102,6 +103,21 @@ public class CompanyServices {
 			String legalName = companyList.get(i).getLegalName();
 			String email = companyList.get(i).getEmail();
 			String catalogURI = companyList.get(i).getCatalogURI();
+			
+			String queryDescribe = 
+					"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +  
+					"\r\n" + 
+					"DESCRIBE exco:"+companyID+"\r\n" + 
+					"WHERE\r\n" + 
+					"{\r\n" + 
+					"exco:"+companyID+" ?p ?o .\r\n" + 
+					"}";
+			
+			Query query = QueryFactory.create(queryDescribe);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+
+			Model results = qexec.execDescribe();
+			if (results.isEmpty()) {
 	
 			String queryUpdate = 
 							"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
@@ -125,6 +141,15 @@ public class CompanyServices {
 			up.execute();
 			
 			jsonArrayAdd.add(exco+companyID);
+			}else {
+				String message = "CONFLICT: already exists a Company with this same ID: "+exco+companyID;
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+				String output = new String(outputStream.toByteArray());
+				output = message;
+				return Response.status(Response.Status.CONFLICT)
+						.entity(output)
+						.build();
+			}
 			
 			}
 			JsonArray ja = jsonArrayAdd.build();
@@ -132,8 +157,10 @@ public class CompanyServices {
 			JsonWriter writer = Json.createWriter(outputStream);
 			writer.writeArray(ja);
 			String output = new String(outputStream.toByteArray());
-			return output;
-	}
+			return Response.status(Response.Status.CREATED)
+					   .entity(output)
+					   .build();	
+			}
 
 	//PUT
 	public void updateCompany(String oldCompanyID, Company newCompany) {
