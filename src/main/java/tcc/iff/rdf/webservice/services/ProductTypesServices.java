@@ -35,15 +35,14 @@ public class ProductTypesServices {
 
 		String querySelect =  
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
-				"\r\n" + 
-				"SELECT ?ProductTypes \r\n" + 
-				"WHERE {?ProductTypes   	 rdf:type			owl:Class;\r\n" + 
-				"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"			 rdfs:subClassOf		<http://schema.org/Product> .}";
-		
+						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+						"\r\n" + 
+						"SELECT ?ProductTypes \r\n" + 
+						"WHERE {?ProductTypes   	 rdf:type			owl:Class;\r\n" + 
+						"			 rdfs:subClassOf		<http://schema.org/Product> .}";
+
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
@@ -51,7 +50,7 @@ public class ProductTypesServices {
 		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
 		String p = "ProductTypes";
 		while(results.hasNext()) {
-		jsonArrayAdd.add(results.nextSolution().getResource(p).getURI());
+			jsonArrayAdd.add(results.nextSolution().getResource(p).getURI());
 		}
 		JsonArray ja = jsonArrayAdd.build();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -68,22 +67,21 @@ public class ProductTypesServices {
 
 		String q = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
-				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
-				"\r\n" + 
-				"DESCRIBE exp:"+productTypeID+" pto:"+productTypeID+"\r\n" + 
-				"WHERE {\r\n" + 
-				"			 pto:"+productTypeID+" rdf:type			owl:Class;\r\n" + 
-				"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
-				"  \r\n" + 
-				"  OPTIONAL { exp:"+productTypeID+"  rdf:type			owl:Class;\r\n" + 
-				"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"			 rdfs:subClassOf		<http://schema.org/Product> . }\r\n" + 
-				"}";
+						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+						"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
+						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+						"\r\n" + 
+						"DESCRIBE exp:"+productTypeID+" pto:"+productTypeID+"\r\n" + 
+						"WHERE {\r\n" + 
+						"			 pto:"+productTypeID+" rdf:type			owl:Class;\r\n" + 
+						"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+						"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
+						"  \r\n" + 
+						"  OPTIONAL { exp:"+productTypeID+"  rdf:type			owl:Class;\r\n" + 
+						"			 rdfs:subClassOf		<http://schema.org/Product> . }\r\n" + 
+						"}";
 
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -105,30 +103,84 @@ public class ProductTypesServices {
 		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
 		String exp = "http://localhost:8080/webservice/webapi/producttypes/";
 		for(int i=0; i<TAM; i++) {
-			
 			String id = newProductType.get(i).getId();
 			String label = newProductType.get(i).getLabel();
 			String homepage = newProductType.get(i).getHomepage();
 			String description = newProductType.get(i).getDescription();
 			String language = newProductType.get(i).getLanguage();
-			
-			String queryDescribe = "PREFIX pto: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+			String subClassOf = newProductType.get(i).getSubClassOf();
+			String superClassURI = "exp:"+subClassOf+"";
+
+			if (subClassOf.isEmpty()) {
+				return Response.status(422)
+						.entity("The 'subClassOf' field is required! If you don't know which Class this"
+								+ " belongs to, then fill it with 'ProductOrService' and submit again.")
+						.build();
+			}else
+				if(subClassOf.contentEquals("ProductOrService")) {
+					superClassURI = "gr:ProductOrService";		
+				}else {
+
+					String queryDescribe = 
+							"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+
+							"\r\n" + 
+							"DESCRIBE exp:"+subClassOf+"\r\n" + 
+							"WHERE\r\n" + 
+							"{\r\n" + 
+							"exp:"+subClassOf+" ?p ?o \r\n"+
+							"}";
+
+					Query query = QueryFactory.create(queryDescribe);
+					QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+
+					Model results = qexec.execDescribe();
+					if (results.isEmpty()) {
+						superClassURI = "pto:"+subClassOf+"";	
+						String queryDescribe2 = 
+								"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+										"\r\n" + 
+										"DESCRIBE pto:"+subClassOf+"\r\n" + 
+										"WHERE\r\n" + 
+										"{\r\n" + 
+										"pto:"+subClassOf+" ?p ?o .\r\n" + 
+										"}";
+
+						Query query2 = QueryFactory.create(queryDescribe2);
+						QueryExecution qexec2 = QueryExecutionFactory.sparqlService(sparqlEndpoint, query2);
+
+						Model results2 = qexec2.execDescribe();
+						if (results2.isEmpty()) {
+								
+							return Response.status(422)
+									.entity("Please, fill the 'subClassOf' field with a valid Class ID! "
+											+ "If you don't know which Class this belongs to, then fill it with 'ProductOrService' and submit again.")
+									.build();
+						}
+					}
+
+				}
+
+
+			String qD = "PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
 					"\r\n" + 
-					"DESCRIBE pto:"+id+"\r\n" + 
+					"DESCRIBE exp:"+id+"\r\n" + 
 					"WHERE\r\n" + 
 					"{\r\n" + 
-					"pto:"+id+" ?p ?o .\r\n" + 
+					"exp:"+id+" ?p ?o .\r\n" + 
 					"}";
-			
-			Query query = QueryFactory.create(queryDescribe);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
-			Model results = qexec.execDescribe();
-			if (results.isEmpty()) {
+			Query q = QueryFactory.create(qD);
+			QueryExecution qex = QueryExecutionFactory.sparqlService(sparqlEndpoint, q);
+
+			Model resultados = qex.execDescribe();
+			if (resultados.isEmpty()) {
+
 				String queryUpdate = 
-								"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 								"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 								"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+								"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
 								"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
 								"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
 								"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
@@ -138,7 +190,7 @@ public class ProductTypesServices {
 								"INSERT DATA\r\n" + 
 								"{ \r\n" + 
 								"  exp:"+id+"	  	 rdf:type			owl:Class;\r\n" + 
-								"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+								"			 rdfs:subClassOf		"+superClassURI+";\r\n" + 
 								"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
 								"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
 								"			 rdfs:label			'"+label+"';\r\n" + 
@@ -148,13 +200,13 @@ public class ProductTypesServices {
 								"			\r\n" + 
 								"}		\r\n" + 
 								"";
-	
+
 				UpdateRequest request = UpdateFactory.create(queryUpdate);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 				up.execute();
-				
+
 				jsonArrayAdd.add(exp+id);
-				
+
 			}else
 			{
 				String message = "CONFLICT: the ProductType "+id+" already exists: "+exp+id;
@@ -174,57 +226,110 @@ public class ProductTypesServices {
 		return Response.status(Response.Status.CREATED).
 				entity(output)
 				.build();	
-		}
+	}
 
 	//@PUT
 	public Response updateProductType(String oldProductID, ProductType newProductType) {
 
 		auth.getAuthentication();
-		
+
 		String exp = "http://localhost:8080/webservice/webapi/producttypes/";
-		
 		String id = newProductType.getId();
 		String label = newProductType.getLabel();
 		String homepage = newProductType.getHomepage();
 		String description = newProductType.getDescription();
 		String language = newProductType.getLanguage();
+		String subClassOf = newProductType.getSubClassOf();
+		String superClassURI = "exp"+subClassOf;
+
+		if (subClassOf.isEmpty()) {
+			return Response.status(422)
+					.entity("The 'subClassOf' field is required! If you don't know which Class this"
+							+ " belongs to, then fill it with 'ProductOrService' and submit again.")
+					.build();
+		}else
+			if(subClassOf.contentEquals("ProductOrService")) {
+				superClassURI = "gr:ProductOrService";		
+			}else {
+
+				String queryDescribe = 
+						"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+
+						"\r\n" + 
+						"DESCRIBE exp:"+subClassOf+"\r\n" + 
+						"WHERE\r\n" + 
+						"{\r\n" + 
+						"exp:"+subClassOf+" ?p ?o \r\n"+
+						"}";
+
+				Query query = QueryFactory.create(queryDescribe);
+				QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+
+				Model results = qexec.execDescribe();
+				if (results.isEmpty()) {
+					superClassURI = "pto:"+subClassOf+"";	
+					String queryDescribe2 = 
+							"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+									"\r\n" + 
+									"DESCRIBE pto:"+subClassOf+"\r\n" + 
+									"WHERE\r\n" + 
+									"{\r\n" + 
+									"pto:"+subClassOf+" ?p ?o .\r\n" + 
+									"}";
+
+					Query query2 = QueryFactory.create(queryDescribe2);
+					QueryExecution qexec2 = QueryExecutionFactory.sparqlService(sparqlEndpoint, query2);
+
+					Model results2 = qexec2.execDescribe();
+					if (results2.isEmpty()) {
+							
+						return Response.status(422)
+								.entity("Please, fill the 'subClassOf' field with a valid Class ID! "
+										+ "If you don't know which Class this belongs to, then fill it with 'ProductOrService' and submit again.")
+								.build();
+					}
+				}
+
+			}
+
+		
 
 		String queryUpdate = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
-				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
-				"\r\n" + 
-				"DELETE \r\n" + 
-				"	{ exp:"+oldProductID+" ?p ?s }\r\n" + 
-				"WHERE\r\n" + 
-				"{ \r\n" + 
-				"  exp:"+oldProductID+"	  	 ?p ?s;" +
-			    "rdf:type			owl:Class;\r\n" + 
-				"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
-				"};\r\n" + 
-				"\r\n" + 
-				"INSERT DATA\r\n" + 
-				"{ \r\n" + 
-				"  exp:"+id+"	  	 rdf:type			owl:Class;\r\n" + 
-				"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-				"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
-				"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
-				"			 rdfs:label			'"+label+"';\r\n" + 
-				"			 foaf:homepage			'"+homepage+"';\r\n" + 
-				"			 gr:description			'"+description+"';\r\n" + 
-				"			 lang:namespacelang		'"+language+"' .\r\n" + 
-				"			\r\n" + 
-				"}";
+						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+						"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
+						"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
+						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+						"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
+						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+						"\r\n" + 
+						"DELETE \r\n" + 
+						"	{ exp:"+oldProductID+" ?p ?s }\r\n" + 
+						"WHERE\r\n" + 
+						"{ \r\n" + 
+						"  exp:"+oldProductID+"	  	 ?p ?s;" +
+						"rdf:type			owl:Class;\r\n" + 
+						"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
+						"};\r\n" + 
+						"\r\n" + 
+						"INSERT DATA\r\n" + 
+						"{ \r\n" + 
+						"  exp:"+id+"	  	 rdf:type			owl:Class;\r\n" + 
+						"			 rdfs:subClassOf		"+superClassURI+";\r\n" + 
+						"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
+						"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
+						"			 rdfs:label			'"+label+"';\r\n" + 
+						"			 foaf:homepage			'"+homepage+"';\r\n" + 
+						"			 gr:description			'"+description+"';\r\n" + 
+						"			 lang:namespacelang		'"+language+"' .\r\n" + 
+						"			\r\n" + 
+						"}";
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
-		
+
 		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
 		jsonArrayAdd.add(exp+id);
 		JsonArray ja = jsonArrayAdd.build();
@@ -242,7 +347,7 @@ public class ProductTypesServices {
 		auth.getAuthentication();
 
 		String updateQuery = 
-						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
 						"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
@@ -256,7 +361,6 @@ public class ProductTypesServices {
 						"{ \r\n" + 
 						"  exp:"+productID+"	  	?p ?s;" +
 						" rdf:type			owl:Class;\r\n" + 
-						"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
 						"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
 						"}";
 
@@ -265,11 +369,11 @@ public class ProductTypesServices {
 		up.execute();
 
 	}
-	
+
 	//DELETE ALL 
 	public void deleteAllProductsTypes() {
 		auth.getAuthentication();
-		
+
 		String updateQuery = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
@@ -284,11 +388,10 @@ public class ProductTypesServices {
 						"WHERE\r\n" + 
 						"{ \r\n" + 
 						"  ?productType	  	 ?p			?s;" + 
-					    "			 rdf:type			owl:Class;\r\n" + 
-						"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
+						"			 rdf:type			owl:Class;\r\n" + 
 						"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
 						"}";
-		
+
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
@@ -296,7 +399,7 @@ public class ProductTypesServices {
 
 	public String getOffersToProducts(String productID) {
 		auth.getAuthentication();
-		
+
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
@@ -308,7 +411,7 @@ public class ProductTypesServices {
 				"				        [rdf:type gr:UnitPriceSpecification ;\r\n" + 
 				"				           gr:hasCurrencyValue		?Prices ]}\r\n" + 
 				"ORDER BY(?Prices)";
-		
+
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
@@ -317,8 +420,8 @@ public class ProductTypesServices {
 		String c = "Companies";
 		String p = "Prices";
 		while(results.hasNext()) {
-		jsonArrayAdd.add(results.nextSolution().getResource(c).getURI())
-					.add(results.nextSolution().getLiteral(p).toString());
+			jsonArrayAdd.add(results.nextSolution().getResource(c).getURI())
+			.add(results.nextSolution().getLiteral(p).toString());
 		}
 		JsonArray ja = jsonArrayAdd.build();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

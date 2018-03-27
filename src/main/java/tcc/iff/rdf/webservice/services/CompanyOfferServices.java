@@ -266,23 +266,22 @@ public class CompanyOfferServices {
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 						"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
 						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 						"\r\n" + 
 						"DELETE {exco:"+companyID+"	gr:offers     ?Offers }\r\n" + 
 						"WHERE\r\n" + 
 						"{\r\n" + 
 						"exco:"+companyID+"	gr:offers     ?Offers    .\r\n" +
 						"};\r\n" + 
-
-				"\r\n" + 
-				"DELETE {?Offer	?p     ?o }\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?Offer	?p     ?o;"
-				+ "		gr:BusinessEntity	exco:"+companyID+" .\r\n" +
-				"}\r\n" + 
-				"";
-
-
+						"DELETE \r\n" + 
+						"	{ ?offers ?p ?o }\r\n" + 
+						"WHERE\r\n" + 
+						"{ \r\n" + 
+						"?offers ?p ?o;\r\n" +
+						"rdf:type gr:Offering;\r\n" +
+						"		gr:BusinessEntity		exco:"+companyID+".\r\n"+
+						"}";
+		
 
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

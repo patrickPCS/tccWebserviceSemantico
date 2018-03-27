@@ -7,7 +7,14 @@ public class ProductType {
 	private String homepage;
 	private String language;
 	private String description;
+	private String subClassOf;
 	
+	public String getSubClassOf() {
+		return subClassOf;
+	}
+	public void setSubClassOf(String subClassOf) {
+		this.subClassOf = subClassOf;
+	}
 	public String getId() {
 		return id;
 	}
