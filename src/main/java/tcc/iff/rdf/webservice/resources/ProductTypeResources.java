@@ -50,8 +50,8 @@ public class ProductTypeResources {
 	@GET
 	@Path("/{ProductID}")
     @Produces(RDFMediaType.APPLICATION_JSON_LD)
-	public String lerProduto(@PathParam("ProductID") String prodName) {
-		return prodServ.getProductType(prodName);
+	public Response lerProduto(@PathParam("ProductID") String productTypeID) {
+		return prodServ.getProductType(productTypeID);
 	}
 	
 	@DELETE

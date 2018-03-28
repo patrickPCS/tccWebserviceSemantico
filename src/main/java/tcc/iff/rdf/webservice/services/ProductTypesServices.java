@@ -6,6 +6,7 @@ import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 import javax.json.JsonWriter;
 import javax.ws.rs.core.Response;
 
@@ -13,6 +14,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -27,7 +29,7 @@ import tcc.iff.rdf.webservice.model.ProductType;
 public class ProductTypesServices {
 
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
-	Authentication auth = new Authentication();	
+	Authentication auth = new Authentication();
 
 	//@GET All
 	public String getAllProductTypes() {
@@ -62,36 +64,95 @@ public class ProductTypesServices {
 	}
 
 	//@GET
-	public String getProductType(String productTypeID) {
+	public Response getProductType(String productTypeID) {
 		auth.getAuthentication();
+		
+		String queryDescribe = 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+				"\r\n" + 
+				"DESCRIBE exp:"+productTypeID+" pto:"+productTypeID+"\r\n" + 
+				"WHERE\r\n" + 
+				"{\r\n" + 
+				"OPTIONAL { exp:"+productTypeID+" ?p ?o . }\r\n"+
+				"OPTIONAL { pto:"+productTypeID+" ?p ?o . }\r\n"+
+				"}";
 
+		Query qr = QueryFactory.create(queryDescribe);
+		QueryExecution qx = QueryExecutionFactory.sparqlService(sparqlEndpoint, qr);
+
+		Model rst = qx.execDescribe();
+		if (rst.isEmpty()) {
+			return Response.status(422)
+					.entity("Please, choose a valid ProductType ID.")
+					.build();
+		}
+		
 		String q = 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-						"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
-						"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
-						"\r\n" + 
-						"DESCRIBE exp:"+productTypeID+" pto:"+productTypeID+"\r\n" + 
-						"WHERE {\r\n" + 
-						"			 pto:"+productTypeID+" rdf:type			owl:Class;\r\n" + 
-						"			 rdfs:subClassOf		gr:ProductOrService;\r\n" + 
-						"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
-						"  \r\n" + 
-						"  OPTIONAL { exp:"+productTypeID+"  rdf:type			owl:Class;\r\n" + 
-						"			 rdfs:subClassOf		<http://schema.org/Product> . }\r\n" + 
-						"}";
-
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
+				"PREFIX foaf: <http://xmlns.com/foaf/0.1/>\r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+				"\r\n" + 
+				"SELECT ?label ?homepage ?language ?description ?subClassOf\r\n" + 
+				"\r\n" + 
+				"WHERE{ \r\n" + 
+				"  \r\n" + 
+				"  OPTIONAL{\r\n" + 
+				"  	exp:"+productTypeID+" 	  rdfs:label	?label;\r\n" + 
+				"           		  foaf:homepage		?homepage;\r\n" + 
+				"          	   	  lang:namespacelang	  ?language;\r\n" + 
+				"          	      gr:description	?description .\r\n" + 
+				"    \r\n" + 
+				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), 'http://www.productontology.org/id/')}\r\n" + 
+				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/producttypes/')}\r\n" + 
+				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/goodrelations/')}\r\n" + 
+				"  \r\n" + 
+				" }\r\n" + 
+				" \r\n" + 
+				"   OPTIONAL {\r\n" + 
+				"    pto:"+productTypeID+"	  rdfs:label	?label;\r\n" + 
+				"           		  foaf:homepage		?homepage;\r\n" + 
+				"          	   	  lang:namespacelang	  ?language;\r\n" + 
+				"          	      rdfs:label		?description .\r\n" + 
+				"          \r\n" + 
+				"  		OPTIONAL {  pto:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/goodrelations/')}\r\n" + 
+				"}\r\n" + 
+				"   \r\n" + 
+				"}";
+		
+		
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-
-		Model results = qexec.execDescribe();	
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		results.write(outputStream, "JSON-LD");
-		String output = new String(outputStream.toByteArray());
-
-		return output;
+		ResultSet results = qexec.execSelect();
+		
+		  QuerySolution soln = results.nextSolution() ;
+	      String label = soln.getLiteral("label").toString() ;  
+	      String homepage = soln.getResource("homepage").toString() ;
+	      String language = soln.getLiteral("language").toString() ;
+	      String description = soln.getLiteral("description").toString() ;
+	      String subClassOf = soln.getResource("subClassOf").toString() ;
+	    
+			JsonObject jobj = Json.createObjectBuilder()
+					.add("id", productTypeID)
+					.add("label",label)
+					.add("homepage",homepage)
+					.add("language",language)
+					.add("description",description)
+					.add("subClassOf", subClassOf)
+					.build();
+		
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			JsonWriter writer = Json.createWriter(outputStream);
+			writer.writeObject(jobj);
+			String output = new String(outputStream.toByteArray());
+			writer.close();
+		
+			return Response.status(Response.Status.OK)
+					.entity(output)
+					.build();
 	}
 
 	//@POST
@@ -194,7 +255,7 @@ public class ProductTypesServices {
 								"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
 								"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
 								"			 rdfs:label			'"+label+"';\r\n" + 
-								"			 foaf:homepage			'"+homepage+"';\r\n" + 
+								"			 foaf:homepage			<"+homepage+">;\r\n" + 
 								"			 gr:description			'"+description+"';\r\n" + 
 								"			 lang:namespacelang		'"+language+"' .\r\n" + 
 								"			\r\n" + 
@@ -320,7 +381,7 @@ public class ProductTypesServices {
 						"			 rdfs:subClassOf		<http://schema.org/Product>;\r\n" + 
 						"			 rdf:type			<http://www.productontology.org/>;\r\n" + 
 						"			 rdfs:label			'"+label+"';\r\n" + 
-						"			 foaf:homepage			'"+homepage+"';\r\n" + 
+						"			 foaf:homepage			<"+homepage+">;\r\n" + 
 						"			 gr:description			'"+description+"';\r\n" + 
 						"			 lang:namespacelang		'"+language+"' .\r\n" + 
 						"			\r\n" + 
