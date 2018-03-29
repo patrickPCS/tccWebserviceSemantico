@@ -15,10 +15,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import tcc.iff.rdf.webservice.model.ProductType;
+import tcc.iff.rdf.webservice.services.Methods;
 import tcc.iff.rdf.webservice.services.ProductTypesServices;
 
 @Path("/producttypes")
 public class ProductTypeResources {
+	
+	Methods methods = new Methods();
 		
 	ProductTypesServices prodServ = new ProductTypesServices();
 	@GET
@@ -57,7 +60,7 @@ public class ProductTypeResources {
 		    	"application/rdf+json"
 		    	})
 	public Response lerProduto(@PathParam("ProductID") String productTypeID, @HeaderParam("Accept") String accept) {
-		return prodServ.getProductType(productTypeID, accept);
+			return prodServ.getProductType(productTypeID, accept);
 	}
 	
 	@DELETE

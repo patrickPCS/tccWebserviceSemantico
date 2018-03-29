@@ -60,7 +60,7 @@ public class ProductTypesServices {
 	public Response getProductType(String productTypeID, String accept) {
 		auth.getAuthentication();
 		String format;
-		
+
 		String queryDescribe = methods.getProductTypeSparqlDescribe(productTypeID);
 
 		Query qr = QueryFactory.create(queryDescribe);
@@ -73,21 +73,21 @@ public class ProductTypesServices {
 					.build();
 		}
 		
-		String q = methods.getProductTypeSparqlSelect(productTypeID);
-		
-		if (accept == null || accept.equals("application/json")){
-			
-		Query query = QueryFactory.create(q);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-		ResultSet results = qexec.execSelect();
-		
-		  QuerySolution soln = results.nextSolution() ;
-	      String label = soln.getLiteral("label").toString() ;  
-	      String homepage = soln.getResource("homepage").toString() ;
-	      String language = soln.getLiteral("language").toString() ;
-	      String description = soln.getLiteral("description").toString() ;
-	      String subClassOf = soln.getResource("subClassOf").toString() ;
-	    
+		if(accept.equals("application/json") || methods.isValidFormat(accept)==false)
+		{
+			String q = methods.getProductTypeSparqlSelect(productTypeID);
+
+			Query query = QueryFactory.create(q);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+			ResultSet results = qexec.execSelect();
+
+			QuerySolution soln = results.nextSolution() ;
+			String label = soln.getLiteral("label").toString() ;  
+			String homepage = soln.getResource("homepage").toString() ;
+			String language = soln.getLiteral("language").toString() ;
+			String description = soln.getLiteral("description").toString() ;
+			String subClassOf = soln.getResource("subClassOf").toString() ;
+
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("id", productTypeID)
 					.add("label",label)
@@ -96,43 +96,30 @@ public class ProductTypesServices {
 					.add("description",description)
 					.add("subClassOf", subClassOf)
 					.build();
-		
+
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			JsonWriter writer = Json.createWriter(outputStream);
 			writer.writeObject(jobj);
 			String output = new String(outputStream.toByteArray());
 			writer.close();
-		
+
 			return Response.status(Response.Status.OK)
 					.entity(output)
 					.build();
-		}else
-		{
-			if(methods.isValidFormat(accept) == false) {
-				
+		}
+
+		else{
+
 			format = methods.convertFromAcceptToFormat(accept);
-	
-					ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-					rst.write(outputStream, format);
-					String output = new String(outputStream.toByteArray());
-			
-					return Response.status(Response.Status.OK)
+
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			rst.write(outputStream, format);
+			String output = new String(outputStream.toByteArray());
+
+			return Response.status(Response.Status.OK)
 					.entity(output)
 					.build();
-			}else
-			{
-				return Response.status(406)
-						.entity("Please, insert a valid format! The accepted formats are:"
-								+ "\n application/json "
-								+ "\n application/ld+json "
-								+ "\n application/n-triples"
-								+ "\n application/rdf+xml"
-								+ "\n application/turtle"
-								+ "\n application/rdf+json ")
-						.build();
-			}
 		}
-			
 	}
 
 	//@POST
@@ -192,7 +179,7 @@ public class ProductTypesServices {
 
 						Model results2 = qexec2.execDescribe();
 						if (results2.isEmpty()) {
-								
+
 							return Response.status(422)
 									.entity("Please, fill the 'subClassOf' field with a valid Class ID! "
 											+ "If you don't know which Class this belongs to, then fill it with 'ProductOrService' and submit again.")
@@ -323,7 +310,7 @@ public class ProductTypesServices {
 
 					Model results2 = qexec2.execDescribe();
 					if (results2.isEmpty()) {
-							
+
 						return Response.status(422)
 								.entity("Please, fill the 'subClassOf' field with a valid Class ID! "
 										+ "If you don't know which Class this belongs to, then fill it with 'ProductOrService' and submit again.")
@@ -333,7 +320,7 @@ public class ProductTypesServices {
 
 			}
 
-		
+
 
 		String queryUpdate = 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 

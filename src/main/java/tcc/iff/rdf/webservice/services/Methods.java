@@ -28,7 +28,7 @@ public class Methods {
 	}
 	
 	public boolean isValidFormat(String accept) {
-		if (accept == "application/json" || accept == "application/ld+json" || accept == "application/n-triples" || accept == "application/rdf+xml" || accept == "application/turtle" || accept == "application/rdf+json" ) 
+		if (accept.equals("application/json") || accept.equals("application/ld+json") || accept.equals("application/n-triples") || accept.equals("application/rdf+xml") || accept.equals("application/turtle") || accept.equals("application/rdf+json") ) 
 			return true;
 			
 		else
