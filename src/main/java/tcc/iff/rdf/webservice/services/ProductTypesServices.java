@@ -30,20 +30,13 @@ public class ProductTypesServices {
 
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
 	Authentication auth = new Authentication();
+	Methods methods = new Methods();
 
 	//@GET All
 	public String getAllProductTypes() {
 		auth.getAuthentication();
 
-		String querySelect =  
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-						"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
-						"\r\n" + 
-						"SELECT ?ProductTypes \r\n" + 
-						"WHERE {?ProductTypes   	 rdf:type			owl:Class;\r\n" + 
-						"			 rdfs:subClassOf		<http://schema.org/Product> .}";
+		String querySelect = methods.getAllProductTypesSparqlSelect();
 
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -64,19 +57,11 @@ public class ProductTypesServices {
 	}
 
 	//@GET
-	public Response getProductType(String productTypeID) {
+	public Response getProductType(String productTypeID, String accept) {
 		auth.getAuthentication();
+		String format;
 		
-		String queryDescribe = 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
-				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-				"\r\n" + 
-				"DESCRIBE exp:"+productTypeID+" pto:"+productTypeID+"\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"OPTIONAL { exp:"+productTypeID+" ?p ?o . }\r\n"+
-				"OPTIONAL { pto:"+productTypeID+" ?p ?o . }\r\n"+
-				"}";
+		String queryDescribe = methods.getProductTypeSparqlDescribe(productTypeID);
 
 		Query qr = QueryFactory.create(queryDescribe);
 		QueryExecution qx = QueryExecutionFactory.sparqlService(sparqlEndpoint, qr);
@@ -88,42 +73,10 @@ public class ProductTypesServices {
 					.build();
 		}
 		
-		String q = 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
-				"PREFIX foaf: <http://xmlns.com/foaf/0.1/>\r\n" + 
-				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
-				"\r\n" + 
-				"SELECT ?label ?homepage ?language ?description ?subClassOf\r\n" + 
-				"\r\n" + 
-				"WHERE{ \r\n" + 
-				"  \r\n" + 
-				"  OPTIONAL{\r\n" + 
-				"  	exp:"+productTypeID+" 	  rdfs:label	?label;\r\n" + 
-				"           		  foaf:homepage		?homepage;\r\n" + 
-				"          	   	  lang:namespacelang	  ?language;\r\n" + 
-				"          	      gr:description	?description .\r\n" + 
-				"    \r\n" + 
-				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), 'http://www.productontology.org/id/')}\r\n" + 
-				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/producttypes/')}\r\n" + 
-				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/goodrelations/')}\r\n" + 
-				"  \r\n" + 
-				" }\r\n" + 
-				" \r\n" + 
-				"   OPTIONAL {\r\n" + 
-				"    pto:"+productTypeID+"	  rdfs:label	?label;\r\n" + 
-				"           		  foaf:homepage		?homepage;\r\n" + 
-				"          	   	  lang:namespacelang	  ?language;\r\n" + 
-				"          	      rdfs:label		?description .\r\n" + 
-				"          \r\n" + 
-				"  		OPTIONAL {  pto:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/goodrelations/')}\r\n" + 
-				"}\r\n" + 
-				"   \r\n" + 
-				"}";
+		String q = methods.getProductTypeSparqlSelect(productTypeID);
 		
-		
+		if (accept == null || accept.equals("application/json")){
+			
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 		ResultSet results = qexec.execSelect();
@@ -153,6 +106,33 @@ public class ProductTypesServices {
 			return Response.status(Response.Status.OK)
 					.entity(output)
 					.build();
+		}else
+		{
+			if(methods.isValidFormat(accept) == false) {
+				
+			format = methods.convertFromAcceptToFormat(accept);
+	
+					ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+					rst.write(outputStream, format);
+					String output = new String(outputStream.toByteArray());
+			
+					return Response.status(Response.Status.OK)
+					.entity(output)
+					.build();
+			}else
+			{
+				return Response.status(406)
+						.entity("Please, insert a valid format! The accepted formats are:"
+								+ "\n application/json "
+								+ "\n application/ld+json "
+								+ "\n application/n-triples"
+								+ "\n application/rdf+xml"
+								+ "\n application/turtle"
+								+ "\n application/rdf+json ")
+						.build();
+			}
+		}
+			
 	}
 
 	//@POST

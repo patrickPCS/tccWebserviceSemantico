@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -13,7 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import tcc.iff.rdf.webservice.RDFMediaType;
 import tcc.iff.rdf.webservice.model.ProductType;
 import tcc.iff.rdf.webservice.services.ProductTypesServices;
 
@@ -49,9 +49,15 @@ public class ProductTypeResources {
 	
 	@GET
 	@Path("/{ProductID}")
-    @Produces(RDFMediaType.APPLICATION_JSON_LD)
-	public Response lerProduto(@PathParam("ProductID") String productTypeID) {
-		return prodServ.getProductType(productTypeID);
+    @Produces({	"application/json", 
+		    	"application/ld+json",
+		    	"application/n-triples",
+		    	"application/rdf+xml",
+		    	"application/turtle",
+		    	"application/rdf+json"
+		    	})
+	public Response lerProduto(@PathParam("ProductID") String productTypeID, @HeaderParam("Accept") String accept) {
+		return prodServ.getProductType(productTypeID, accept);
 	}
 	
 	@DELETE
