@@ -19,6 +19,7 @@ import org.apache.jena.update.UpdateRequest;
 import tcc.iff.rdf.webservice.connection.Authentication;
 
 public class OfferServices {
+	Methods methods = new Methods();
 
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
 	Authentication auth = new Authentication();	
@@ -27,15 +28,7 @@ public class OfferServices {
 	public String getAllOffers() {
 		auth.getAuthentication();
 
-		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
-				"\r\n" + 
-				"SELECT ?Offers\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?company	gr:offers     ?Offers    .\r\n" + 
-				"}\r\n" + 
-				"";
+		String querySelect = methods.getAllOffersSparqlSelect();
 		
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -59,25 +52,7 @@ public class OfferServices {
 	public void deleteAllOffers() {
 		auth.getAuthentication();
 		
-		String updateQuery = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"\r\n" + 
-				"DELETE {?company	gr:offers     ?Offers }\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?company	gr:offers     ?Offers    .\r\n" +
-				"};\r\n" + 
-				
-				"\r\n" + 
-				"DELETE {?Offer	?p     ?o }\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?Offer	?p     ?o;"
-				+ "		gr:BusinessEntity	?company .\r\n" +
-				"}\r\n" + 
-				"";
+		String updateQuery = methods.deleteAllOffers();
 		
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

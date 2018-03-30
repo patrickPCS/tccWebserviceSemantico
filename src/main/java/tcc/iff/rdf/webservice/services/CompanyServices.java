@@ -6,6 +6,7 @@ import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 import javax.json.JsonWriter;
 import javax.ws.rs.core.Response;
 
@@ -13,6 +14,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -27,20 +29,13 @@ public class CompanyServices {
 	
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
 	Authentication auth = new Authentication();	
+	Methods methods = new Methods();
 	
 	//GET ALL
 	public String getAllCompanies() {
 		auth.getAuthentication();
 
-		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"\r\n" + 
-				"SELECT ?company\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?company rdf:type gr:BusinessEntity .\r\n" + 
-				"}\r\n" + 
-				"";
+		String querySelect = methods.getAllCompaniesSparqlSelect();
 		
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -63,31 +58,65 @@ public class CompanyServices {
 	}
 	
 	//GET
-	public String getCompany(String companyID) {
+	public Response getCompany(String companyID, String accept) {
 		auth.getAuthentication();
 
-		String q = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-				"\r\n" + 
-				"DESCRIBE exco:"+companyID+"\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"exco:"+companyID+" rdf:type gr:BusinessEntity  .\r\n" + 
-				"}\r\n" + 
-				"";
+		String queryDescribe = methods.getCompanySparqlDescribe(companyID);
+		
+		Query query = QueryFactory.create(queryDescribe);
+		QueryExecution qx = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+		
+		Model rst = qx.execDescribe();
+		if (rst.isEmpty()) {
+			return Response.status(422)
+					.entity("Please, choose a valid ProductType ID.")
+					.build();
+		}
+		
+		if(accept.equals("application/json") || methods.isValidFormat(accept)==false) {
+			
+			String querySelect = methods.getCompanySparqlSelect(companyID);
 
+			Query queryS = QueryFactory.create(querySelect);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, queryS);
+			ResultSet results = qexec.execSelect();
+			
+			QuerySolution soln = results.nextSolution() ;
+			String companyURL = soln.getResource("companyURL").toString() ;  
+			String legalName = soln.getLiteral("legalName").toString() ;
+			String email = soln.getResource("email").toString() ;
+			String catalogURI = soln.getResource("catalogURI").toString() ;
 
-		Query query = QueryFactory.create(q);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+			JsonObject jobj = Json.createObjectBuilder()
+					.add("id", companyID)
+					.add("companyURL",companyURL)
+					.add("legalName",legalName)
+					.add("email",email)
+					.add("catalogURI",catalogURI)
+					.build();
 
-		Model results = qexec.execDescribe();	
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			JsonWriter writer = Json.createWriter(outputStream);
+			writer.writeObject(jobj);
+			String output = new String(outputStream.toByteArray());
+			writer.close();
+
+			return Response.status(Response.Status.OK)
+					.entity(output)
+					.build();
+			
+		}else {
+		
+		String format = methods.convertFromAcceptToFormat(accept);
+		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		results.write(outputStream, "RDF/JSON");
+		rst.write(outputStream, format);
 		String output = new String(outputStream.toByteArray());
 
-		return output;
+		return Response.status(Response.Status.OK)
+				.entity(output)
+				.build();
+		}
 	}
 
 	//POST
@@ -104,14 +133,7 @@ public class CompanyServices {
 			String email = companyList.get(i).getEmail();
 			String catalogURI = companyList.get(i).getCatalogURI();
 			
-			String queryDescribe = 
-					"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +  
-					"\r\n" + 
-					"DESCRIBE exco:"+companyID+"\r\n" + 
-					"WHERE\r\n" + 
-					"{\r\n" + 
-					"exco:"+companyID+" ?p ?o .\r\n" + 
-					"}";
+			String queryDescribe = methods.getCompanySparqlDescribe(companyID);
 			
 			Query query = QueryFactory.create(queryDescribe);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -119,22 +141,7 @@ public class CompanyServices {
 			Model results = qexec.execDescribe();
 			if (results.isEmpty()) {
 	
-			String queryUpdate = 
-							"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-							"PREFIX ex: <http://example.com/>\r\n" + 
-							"PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\r\n" + 
-							"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-							"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-							"\r\n" + 
-							"\r\n" + 
-							"INSERT DATA\r\n" + 
-							"{ \r\n" + 
-							"  exco:"+companyID+" 	rdf:type		gr:BusinessEntity;\r\n" + 
-							"                vcard:hasURL	<"+companyURL+">;\r\n" + 
-							"                vcard:hasEmail	<"+email+">;\r\n" + 
-							"                ex:catalogURI	<"+catalogURI+">;\r\n" + 
-							"                gr:legalName	'"+legalName+"'   .           \r\n" + 
-							"}";
+			String queryUpdate = methods.insertCompanySparql(companyID, companyURL, email, catalogURI, legalName);
 	
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -174,29 +181,7 @@ public class CompanyServices {
 	String email = newCompany.getEmail();
 	String catalogURI = newCompany.getCatalogURI();
 
-	String queryUpdate = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX ex: <http://example.com/>\r\n" + 
-				"PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-				"\r\n" + 
-				"DELETE\r\n" + 
-				"{ exco:"+oldCompanyID+" ?p ?s }\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"exco:"+oldCompanyID+" ?p ?s;\r\n" + 
-				"rdf:type  gr:BusinessEntity .\r\n" + 
-				"};"+
-				"\r\n" + 
-				"INSERT DATA\r\n" + 
-				"{ \r\n" + 
-				"  exco:"+companyID+" 	rdf:type		gr:BusinessEntity;\r\n" + 
-				"                vcard:hasURL	<"+companyURL+">;\r\n" + 
-				"                vcard:hasEmail	<"+email+">;\r\n" + 
-				"                ex:catalogURI	<"+catalogURI+">;\r\n" + 
-				"                gr:legalName	'"+legalName+"' .\r\n" + 
-				"}";
+	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, companyURL, email, catalogURI, legalName);
 	
 	UpdateRequest request = UpdateFactory.create(queryUpdate);
 	UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -218,18 +203,7 @@ public class CompanyServices {
 	public void deleteCompany(String companyID) {
 		auth.getAuthentication();
 
-		String updateQuery = 
-						"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"\r\n" + 
-						"DELETE \r\n" + 
-						"	{ exco:"+companyID+" ?p ?s }\r\n" + 
-						"WHERE\r\n" + 
-						"{ \r\n" + 
-						"  exco:"+companyID+" ?p ?s; .\r\n" + 
-						"}\r\n" + 
-						"";
+		String updateQuery = methods.deleteCompanySparql(companyID);
 
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -240,16 +214,7 @@ public class CompanyServices {
 	public void deleteAllCompanies() {
 		auth.getAuthentication();
 		
-		String updateQuery = "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"\r\n" + 
-				"DELETE\r\n" + 
-				"{ ?companyURL ?p ?s }\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?companyURL ?p ?s;\r\n" + 
-				"rdf:type  gr:BusinessEntity .\r\n" + 
-				"}";
+		String updateQuery = methods.deleteAllCompaniesSparql();
 		
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

@@ -26,20 +26,13 @@ public class CompanyOfferServices {
 
 	String sparqlEndpoint = "http://localhost:10035/catalogs/CatalogoGR/repositories/RepositorioGR/sparql";
 	Authentication auth = new Authentication();	
+	Methods methods = new Methods();
 
 	//@GET All
 	public String getAllOffers(String companyID) {
 		auth.getAuthentication();
 
-		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
-				"\r\n" + 
-				"SELECT ?Offers\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"exco:"+companyID+"	gr:offers     ?Offers    .\r\n" + 
-				"}\r\n" + 
-				"";
+		String querySelect = methods.getAllOffersSparqlSelect(companyID);
 
 		Query query = QueryFactory.create(querySelect);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -64,8 +57,7 @@ public class CompanyOfferServices {
 	public String getOffer(String companyID, String offerID) {
 		auth.getAuthentication();
 
-		String q = 
-				"DESCRIBE <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/"+offerID+">\r\n";
+		String q = methods.getOfferSparqlDescribe(companyID, offerID);
 
 		Query query = QueryFactory.create(q);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -95,14 +87,7 @@ public class CompanyOfferServices {
 			String hasCurrency = OfferList.get(i).getHasCurrency();
 			String price = OfferList.get(i).getPrice();
 
-			String queryDescribe = 
-					"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-							"\r\n" + 
-							"DESCRIBE exo:"+productID+"\r\n" + 
-							"WHERE\r\n" + 
-							"{\r\n" + 
-							"exo:"+productID+" ?p ?o .\r\n" + 
-							"}";
+			String queryDescribe = methods.getOfferSparqlDescribe(companyID, productID);
 
 			Query query = QueryFactory.create(queryDescribe);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -111,31 +96,7 @@ public class CompanyOfferServices {
 
 			if (results.isEmpty()) {
 
-				String queryUpdate = 
-						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-								"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-								"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-								"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
-								"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
-								"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
-								"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-								"\r\n" + 
-								"INSERT DATA\r\n" + 
-								"{ \r\n" + 
-								"  exo:"+productID+"	rdf:type		gr:Offering;\r\n" + 
-								"                        gr:includes      exp:"+productID+";\r\n" + 
-								"	gr:BusinessEntity     exco:"+companyID+";\r\n" + 
-								"	foaf:page     <"+offerURI+">;\r\n" + 
-								"	gr:hasBusinessFunction gr:Sell ;\r\n" + 
-								"	gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
-								"	gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
-								"	gr:hasPriceSpecification\r\n" + 
-								"         [ a gr:UnitPriceSpecification ;\r\n" + 
-								"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-								"           gr:hasCurrencyValue '"+price+"'^^xsd:float;\r\n" + 
-								"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
-								"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
-								"}";
+				String queryUpdate = methods.insertOfferSparql(companyID, productID, offerURI, validFrom, validThrough, hasCurrency, price);
 
 				UpdateRequest request = UpdateFactory.create(queryUpdate);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -178,39 +139,7 @@ public class CompanyOfferServices {
 		String hasCurrency = updatedOffer.getHasCurrency();
 		String price = updatedOffer.getPrice();
 
-		String queryUpdate = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-						"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
-						"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
-						"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-						"\r\n" + 
-						"DELETE \r\n" + 
-						"	{ exo:"+oldOfferID+" ?p ?s }\r\n" + 
-						"WHERE\r\n" + 
-						"{ \r\n" + 
-						"  exo:"+oldOfferID+" ?p ?s;\r\n" + 
-						" 		rdf:type gr:Offering .\r\n" + 
-						"};\r\n" + 
-						"\r\n" + 
-						"INSERT DATA\r\n" + 
-						"{ \r\n" + 
-						"  exo:"+productID+"	rdf:type		gr:Offering;\r\n" + 
-						"                        gr:includes      exp:"+productID+";\r\n" + 
-						"	gr:BusinessEntity     exco:"+companyID+";\r\n" + 
-						"	foaf:page     <"+offerURI+">;\r\n" + 
-						"	gr:hasBusinessFunction gr:Sell ;\r\n" + 
-						"	gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
-						"	gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
-						"	gr:hasPriceSpecification\r\n" + 
-						"         [ rdf:type gr:UnitPriceSpecification ;\r\n" + 
-						"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-						"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
-						"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
-						"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
-						"}";
+		String queryUpdate = methods.updateOfferSparql(oldOfferID, companyID, productID, offerURI, validFrom, validThrough, hasCurrency, price);
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -232,25 +161,7 @@ public class CompanyOfferServices {
 	public void deleteOffer(String companyID, String offerID) {
 		auth.getAuthentication();
 
-		String updateQuery = 
-				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
-						"\r\n" + 
-						"DELETE \r\n" + 
-						"	{ exo:"+offerID+" ?p ?s }\r\n" + 
-						"WHERE\r\n" + 
-						"{ \r\n" + 
-						"  exo:"+offerID+" ?p ?s;\r\n" +
-						" 		rdf:type gr:Offering .\r\n" + 
-						"};\r\n" + 
-						"\r\n" + 
-						"DELETE {exco:"+companyID+"	gr:offers     exo:"+offerID+" }\r\n" + 
-						"WHERE\r\n" + 
-						"{\r\n" + 
-						"exco:"+companyID+"	gr:offers     exo:"+offerID+"    .\r\n" +
-						"}";
+		String updateQuery = methods.deleteOfferSparql(companyID, offerID);
 
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -262,26 +173,7 @@ public class CompanyOfferServices {
 	public void deleteAllOffers(String companyID) {
 		auth.getAuthentication();
 
-		String updateQuery = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
-						"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-						"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-						"\r\n" + 
-						"DELETE {exco:"+companyID+"	gr:offers     ?Offers }\r\n" + 
-						"WHERE\r\n" + 
-						"{\r\n" + 
-						"exco:"+companyID+"	gr:offers     ?Offers    .\r\n" +
-						"};\r\n" + 
-						"DELETE \r\n" + 
-						"	{ ?offers ?p ?o }\r\n" + 
-						"WHERE\r\n" + 
-						"{ \r\n" + 
-						"?offers ?p ?o;\r\n" +
-						"rdf:type gr:Offering;\r\n" +
-						"		gr:BusinessEntity		exco:"+companyID+".\r\n"+
-						"}";
-		
+		String updateQuery = methods.deleteAllOffersSparql(companyID);
 
 		UpdateRequest request = UpdateFactory.create(updateQuery);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
