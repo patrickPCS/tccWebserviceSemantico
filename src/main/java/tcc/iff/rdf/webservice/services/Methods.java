@@ -112,13 +112,10 @@ public class Methods {
 	}
 	
 	public String getOfferSparqlDescribe(String companyID, String productID) {
-		String queryDescribe = "PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-				"\r\n" + 
-				"DESCRIBE exo:"+productID+"\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"exo:"+productID+" ?p ?o .\r\n" + 
-				"}";
+		String queryDescribe = "DESCRIBE <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/"+productID+">\r\n";
+		
+		
+		
 		return queryDescribe;
 	}
 	
@@ -505,6 +502,37 @@ public class Methods {
 				"}\r\n" + 
 				"";
 		
+		return querySelect;
+	}
+
+	public String getOfferSparqlSelect(String companyID, String offerID) {
+		String querySelect = "PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
+				"PREFIX foaf: <http://xmlns.com/foaf/0.1/>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"\r\n" + 
+				"SELECT ?offerURI ?validFrom ?validThrough ?hasCurrency ?price ?companyID\r\n" + 
+				"\r\n" + 
+				"WHERE\r\n" + 
+				"{ \r\n" + 
+				"  exo:"+offerID+" rdf:type gr:Offering;\r\n" + 
+				"         foaf:page	?offerURI;\r\n" + 
+		//		"         gr:validFrom		?validFrom;\r\n" + 
+				"         gr:BusinessEntity	?companyID .\r\n" + 
+			//	"         gr:validThrough		?validThrough .\r\n" + 
+				"\r\n" + 
+				"\r\n" + 
+				"  \r\n" + 
+				"  exo:"+offerID+"	gr:hasPriceSpecification	[] .\r\n" + 
+				"  []	gr:hasCurrency	?hasCurrency .\r\n" + 
+		//		"        gr:hasCurrencyValue	?price .\r\n" + 
+				" \r\n" + 
+				"}\r\n" + 
+				"";
+
 		return querySelect;
 	}
 

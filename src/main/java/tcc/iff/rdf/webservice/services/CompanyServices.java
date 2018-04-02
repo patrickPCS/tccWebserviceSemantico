@@ -81,7 +81,7 @@ public class CompanyServices {
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, queryS);
 			ResultSet results = qexec.execSelect();
 			
-			QuerySolution soln = results.nextSolution() ;
+			QuerySolution soln = results.nextSolution();
 			String companyURL = soln.getResource("companyURL").toString() ;  
 			String legalName = soln.getLiteral("legalName").toString() ;
 			String email = soln.getResource("email").toString() ;

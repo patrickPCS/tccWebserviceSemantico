@@ -7,6 +7,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -18,6 +19,7 @@ import tcc.iff.rdf.webservice.model.Offer;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 import javax.json.JsonWriter;
 
 import javax.ws.rs.core.Response;
@@ -54,20 +56,71 @@ public class CompanyOfferServices {
 	}
 
 	//@GET
-	public String getOffer(String companyID, String offerID) {
+	public Response getOffer(String companyID, String offerID, String accept){
 		auth.getAuthentication();
 
 		String q = methods.getOfferSparqlDescribe(companyID, offerID);
 
 		Query query = QueryFactory.create(q);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+		QueryExecution qx = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+		
+		Model rst = qx.execDescribe();
+		if (rst.isEmpty()) {
+			return Response.status(422)
+					.entity("Please, choose a valid Offer ID.")
+					.build();
+		}
+		
+		if(accept.equals("application/json") || methods.isValidFormat(accept)==false) {
+			
+			String querySelect = methods.getOfferSparqlSelect(companyID, offerID);
 
-		Model results = qexec.execDescribe();	
+			Query queryS = QueryFactory.create(querySelect);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, queryS);
+			
+			ResultSet results = qexec.execSelect();
+			
+			
+			QuerySolution soln = results.nextSolution() ;
+			String offerURI = soln.getResource("offerURI").toString() ;  
+			//String validFrom = soln.getLiteral("validFrom").getDatatypeURI().replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "").toString();
+			//String validThrough = soln.getLiteral("validThrough").getDatatypeURI().replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "").toString();
+			String hasCurrency = soln.getLiteral("hasCurrency").toString();
+			//String price = soln.getLiteral("price").getDatatypeURI().replace("^^<http://www.w3.org/2001/XMLSchema#float>", "").toString();
+			
+			JsonObject jobj = Json.createObjectBuilder()
+					.add("offerID", offerID)
+					.add("companyID", companyID)
+					.add("offerURI",offerURI)
+					//.add("validFrom",validFrom)
+					//.add("validThrough",validThrough)
+					.add("hasCurrency",hasCurrency)
+					//.add("price", price)
+					.build();
+
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			JsonWriter writer = Json.createWriter(outputStream);
+			writer.writeObject(jobj);
+			String output = new String(outputStream.toByteArray());
+			writer.close();
+
+			return Response.status(Response.Status.OK)
+					.entity(output)
+					.build();
+		}
+		
+		else {
+		
+		String format = methods.convertFromAcceptToFormat(accept);
+
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		results.write(outputStream, "JSON-LD");
+		rst.write(outputStream, format);
 		String output = new String(outputStream.toByteArray());
 
-		return output;
+		return Response.status(Response.Status.OK)
+				.entity(output)
+				.build();
+		}
 	}
 
 	//@POST
