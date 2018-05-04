@@ -1,15 +1,20 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.JsonWriter;
 import javax.ws.rs.core.Response;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -17,10 +22,18 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.vocabulary.RDF;
 
 import tcc.iff.rdf.webservice.connection.Authentication;
 import tcc.iff.rdf.webservice.model.ProductType;
@@ -301,23 +314,70 @@ public class ProductTypesServices {
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
 	}
-
+/*
 	public String getOffersToProducts(String productID) {
 		auth.getAuthentication();
 
-		String querySelect = methods.getOffersToProductsSparql(productID);
+		String queryConstruct = methods.getOffersToProductsSparql(productID);
 
-		Query query = QueryFactory.create(querySelect);
+		Query query = QueryFactory.create(queryConstruct);
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
 
-		ResultSet results = qexec.execSelect();
+		Iterator<Triple> results= qexec.execConstructTriples();
+		
+		//Model model = ModelFactory.createDefaultModel();
+		//String gr = "http://purl.org/goodrelations/v1#";
+		//Property hasCurrencyValue = model.createProperty(gr, "hasCurrencyValue");
+		//StmtIterator cit = results.listStatements();
 		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
-		String c = "Companies";
-		String p = "Prices";
+		//String s = "Subject";
+		//String p = "Predicate";
+		//String o = "Object";
+		/*while(cit.hasNext()) {
+			jsonArrayAdd.add(cit.next().getResource().getURI())
+			.add(cit.next().getProperty(hasCurrencyValue).getPredicate().getURI().toString())
+			.add(cit.next().getObject().asLiteral().getFloat());
+			
+		}*/
+		/*
+		while(cit.hasNext()) {
+			Statement qs = cit.next();
+			Resource Prices = qs.getResource().asResource();
+			for ( Resource curr = Prices;
+					!RDF.nil.equals(curr);
+					curr = curr.getRequiredProperty(RDF.rest).getObject().asResource()) {
+				Resource Products = curr.getRequiredProperty(RDF.first).getObject().asResource();
+				RDFNode Price = Products.getRequiredProperty(hasCurrencyValue).getObject();
+				jsonArrayAdd.add((JsonValue) Price);
+			}
+			
+			
 		while(results.hasNext()) {
-			jsonArrayAdd.add(results.nextSolution().getResource(c).getURI())
-			.add(results.nextSolution().getLiteral(p).toString());
+			Triple tp = results.next();
+		
+			Object price = null;
+			Object produtoUri = null;
+			
+			Node p = NodeFactory.createURI("http://purl.org/goodrelations/v1#hasPriceSpecification");
+			if(tp.getSubject().isURI() && tp.predicateMatches(p)) {
+				produtoUri = tp.getSubject().getURI();
+			}
+			
+			if(tp.getObject().isLiteral()) {
+				 price = tp.getObject().getLiteralValue();
+			}
+			if(produtoUri != null) {
+				jsonArrayAdd.add(produtoUri.toString());
+			}
+			if (price != null) {
+				jsonArrayAdd.add(price.toString());
+				
+			}	
 		}
+		
+		
+		
+		qexec.close();
 		JsonArray ja = jsonArrayAdd.build();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		JsonWriter writer = Json.createWriter(outputStream);
@@ -327,3 +387,37 @@ public class ProductTypesServices {
 		return output;
 	}
 }
+*/
+	public Response getOffersToProducts(String productID, String accept) {
+		auth.getAuthentication();
+
+		String queryDescribe = methods.getOffersToProductsSparql(productID);
+		
+		Query query = QueryFactory.create(queryDescribe);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+		Model results = qexec.execDescribe();
+		
+		String format = methods.convertFromAcceptToFormat(accept);
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		results.write(outputStream, format);
+		String output = new String(outputStream.toByteArray());
+
+		return Response.status(Response.Status.OK)
+				.entity(output)
+				.build();
+		
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+

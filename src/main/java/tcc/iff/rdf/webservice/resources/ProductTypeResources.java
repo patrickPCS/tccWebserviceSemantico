@@ -32,9 +32,15 @@ public class ProductTypeResources {
 	
 	@GET
 	@Path("/{ProductID}/offers")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String listarOfertasParaProdutos(@PathParam("ProductID") String productID) {		
-		return prodServ.getOffersToProducts(productID);		
+	@Produces({"application/json", 
+	    	"application/ld+json",
+	    	"application/n-triples",
+	    	"application/rdf+xml",
+	    	"application/turtle",
+	    	"application/rdf+json"
+	    	})
+    public Response listarOfertasParaProdutos(@PathParam("ProductID") String productID, @HeaderParam("Accept") String accept) {		
+		return prodServ.getOffersToProducts(productID, accept);		
     }
 	
 	@DELETE

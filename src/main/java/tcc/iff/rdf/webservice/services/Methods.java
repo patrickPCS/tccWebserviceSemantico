@@ -476,19 +476,36 @@ public class Methods {
 	}
 	
 	public String getOffersToProductsSparql(String productID) {
-		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+	/*String queryConstruct = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
 				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
 				"\r\n" + 
-				"SELECT ?Companies	?Prices \r\n" + 
+				/*"SELECT ?Companies	?Prices \r\n" + 
 				"WHERE { ?Companies 			gr:includes		exp:"+productID+";\r\n" + 
 				"      						gr:hasPriceSpecification\r\n" + 
 				"				        [rdf:type gr:UnitPriceSpecification ;\r\n" + 
 				"				           gr:hasCurrencyValue		?Prices ]}\r\n" + 
 				"ORDER BY(?Prices)";
+					
+				"CONSTRUCT WHERE{ ?Companies 	gr:includes		exp:"+productID+";\r\n"+
+				"								gr:hasPriceSpecification [rdf:type gr:UnitPriceSpecification;\r\n"+
+				"														gr:hasCurrencyValue ?Prices]}\r\n"+
+				"ORDER BY(?Prices)";
+		return queryConstruct;*/
+		String queryDescribe = 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+						"\r\n" + 
+				"DESCRIBE exp:"+productID+" WHERE { ?Companies gr:includes exp:"+productID+";\n" + 
+				"                                         gr:hasPriceSpecification [rdf:type gr:UnitPriceSpecification;\n" + 
+				"                                                                  gr:hasCurrencyValue ?price]}\n" + 
+				"\n" + 
+				"ORDER BY ?prices";
 		
-		return querySelect;
+		return queryDescribe;
 	}
 	
 	public String getAllOffersSparqlSelect() {
