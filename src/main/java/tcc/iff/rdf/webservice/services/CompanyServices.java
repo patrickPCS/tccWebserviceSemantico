@@ -85,14 +85,15 @@ public class CompanyServices {
 			String companyURL = soln.getResource("companyURL").toString() ;  
 			String legalName = soln.getLiteral("legalName").toString() ;
 			String email = soln.getResource("email").toString() ;
-			String catalogURI = soln.getResource("catalogURI").toString() ;
+			String name = soln.getResource("name").toString() ;
 
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("id", companyID)
 					.add("companyURL",companyURL)
 					.add("legalName",legalName)
 					.add("email",email)
-					.add("catalogURI",catalogURI)
+					.add("name",name)
+					.add("label",name)
 					.build();
 
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -131,7 +132,7 @@ public class CompanyServices {
 			String companyURL = companyList.get(i).getCompanyURL();
 			String legalName = companyList.get(i).getLegalName();
 			String email = companyList.get(i).getEmail();
-			String catalogURI = companyList.get(i).getCatalogURI();
+			String name = companyList.get(i).getName();
 			
 			String queryDescribe = methods.getCompanySparqlDescribe(companyID);
 			
@@ -141,7 +142,7 @@ public class CompanyServices {
 			Model results = qexec.execDescribe();
 			if (results.isEmpty()) {
 	
-			String queryUpdate = methods.insertCompanySparql(companyID, companyURL, email, catalogURI, legalName);
+			String queryUpdate = methods.insertCompanySparql(companyID, companyURL, email, name, legalName);
 	
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -179,9 +180,9 @@ public class CompanyServices {
 	String companyURL = newCompany.getCompanyURL();
 	String legalName = newCompany.getLegalName();
 	String email = newCompany.getEmail();
-	String catalogURI = newCompany.getCatalogURI();
+	String name = newCompany.getName();
 
-	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, companyURL, email, catalogURI, legalName);
+	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, companyURL, email, name, legalName);
 	
 	UpdateRequest request = UpdateFactory.create(queryUpdate);
 	UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

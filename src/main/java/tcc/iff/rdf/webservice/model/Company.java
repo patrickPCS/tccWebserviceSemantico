@@ -8,7 +8,7 @@ public class Company {
 	private String companyURL;
 	private String legalName;
 	private String email;
-	private String catalogURI;
+	private String name;
 	
 	public String getCompanyID() {
 		return companyID;
@@ -34,11 +34,11 @@ public class Company {
 	public void setLegalName(String legalName) {
 		this.legalName = legalName;
 	}
-	public String getCatalogURI() {
-		return catalogURI;
+	public String getName() {
+		return name;
 	}
-	public void setCatalogURI(String catalogURI) {
-		this.catalogURI = catalogURI;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	
