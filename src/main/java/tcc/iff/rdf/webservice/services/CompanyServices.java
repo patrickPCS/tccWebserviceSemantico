@@ -88,7 +88,7 @@ public class CompanyServices {
 			String email = soln.getLiteral("email").toString() ;
 			//String name = soln.getLiteral("name").toString() ;
 			String label = soln.getLiteral("label").toString() ;
-
+ 
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("id", companyID)
 					.add("companyURL",companyURL)
@@ -108,7 +108,6 @@ public class CompanyServices {
 			return Response.status(Response.Status.OK)
 					.entity(output)
 					.build();
-			
 		}else {
 		
 		String format = methods.convertFromAcceptToFormat(accept);
@@ -122,7 +121,6 @@ public class CompanyServices {
 				.build();
 		}
 	}
-
 	//POST
 	public Response addCompany(List<Company> companyList) {
 		auth.getAuthentication();

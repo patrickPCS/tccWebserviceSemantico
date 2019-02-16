@@ -194,7 +194,6 @@ public class Methods {
 				"}";
 		
 		return queryInsert;
-		
 	}
 	
 	public String updateCompanySparql(String oldCompanyID, String companyID, String companyURL, String email, String name, String legalName) {

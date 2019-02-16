@@ -52,7 +52,6 @@ public class CompanyResources {
 		public Response lerEmpresa(@PathParam("CompanyID") String companyID, @HeaderParam("Accept") String accept) {
 		return cp.getCompany(companyID, accept);
 	}
-	
 	@DELETE
 	@Path("/{CompanyID}")
 	public Response deletarEmpresa(@PathParam("CompanyID") String companyID) {
