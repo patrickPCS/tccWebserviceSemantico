@@ -83,17 +83,20 @@ public class CompanyServices {
 			
 			QuerySolution soln = results.nextSolution();
 			String companyURL = soln.getResource("companyURL").toString() ;  
-			String legalName = soln.getLiteral("legalName").toString() ;
-			String email = soln.getResource("email").toString() ;
-			String name = soln.getResource("name").toString() ;
+			String legalName = soln.getLiteral("legalName").toString();
+			String grLegalName = soln.getLiteral("grLegalName").toString();
+			String email = soln.getLiteral("email").toString() ;
+			//String name = soln.getLiteral("name").toString() ;
+			String label = soln.getLiteral("label").toString() ;
 
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("id", companyID)
 					.add("companyURL",companyURL)
 					.add("legalName",legalName)
+					.add("grLegalName", grLegalName)
 					.add("email",email)
-					.add("name",name)
-					.add("label",name)
+					//.add("name",name)
+					.add("label",label)
 					.build();
 
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -131,6 +134,7 @@ public class CompanyServices {
 			String companyID = companyList.get(i).getCompanyID();
 			String companyURL = companyList.get(i).getCompanyURL();
 			String legalName = companyList.get(i).getLegalName();
+			String grLegalName = companyList.get(i).getLegalName();
 			String email = companyList.get(i).getEmail();
 			String name = companyList.get(i).getName();
 			
@@ -142,7 +146,7 @@ public class CompanyServices {
 			Model results = qexec.execDescribe();
 			if (results.isEmpty()) {
 	
-			String queryUpdate = methods.insertCompanySparql(companyID, companyURL, email, name, legalName);
+			String queryUpdate = methods.insertCompanySparql(companyID, name, legalName, grLegalName, companyURL, email  );
 	
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
