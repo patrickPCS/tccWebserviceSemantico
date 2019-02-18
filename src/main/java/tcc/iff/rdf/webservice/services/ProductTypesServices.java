@@ -95,18 +95,22 @@ public class ProductTypesServices {
 			ResultSet results = qexec.execSelect();
 
 			QuerySolution soln = results.nextSolution() ;
-			String label = soln.getLiteral("label").toString() ;  
+			String label = soln.getLiteral("label").toString() ;
+			//String name = soln.getLiteral("name").toString();
 			String homepage = soln.getResource("homepage").toString() ;
 			String language = soln.getLiteral("language").toString() ;
 			String description = soln.getLiteral("description").toString() ;
+			String comment = soln.getLiteral("comment").toString();
 			String subClassOf = soln.getResource("subClassOf").toString() ;
 
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("id", productTypeID)
 					.add("label",label)
+					//.add("name", name)
 					.add("homepage",homepage)
 					.add("language",language)
 					.add("description",description)
+					.add("comment",comment)
 					.add("subClassOf", subClassOf)
 					.build();
 
@@ -146,8 +150,10 @@ public class ProductTypesServices {
 		for(int i=0; i<TAM; i++) {
 			String id = newProductType.get(i).getId();
 			String label = newProductType.get(i).getLabel();
+			String name =  newProductType.get(i).getLabel();
 			String homepage = newProductType.get(i).getHomepage();
 			String description = newProductType.get(i).getDescription();
+			String comment = newProductType.get(i).getDescription();
 			String language = newProductType.get(i).getLanguage();
 			String subClassOf = newProductType.get(i).getSubClassOf();
 			String superClassURI = "exp:"+subClassOf+"";
@@ -196,7 +202,7 @@ public class ProductTypesServices {
 			Model resultados = qex.execDescribe();
 			if (resultados.isEmpty()) {
 
-				String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, homepage, description, language);
+				String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, name, homepage, description, comment,  language);
 
 				UpdateRequest request = UpdateFactory.create(queryUpdate);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -233,8 +239,10 @@ public class ProductTypesServices {
 		String exp = "http://localhost:8080/webservice/webapi/producttypes/";
 		String id = newProductType.getId();
 		String label = newProductType.getLabel();
+		String name = newProductType.getLabel();
 		String homepage = newProductType.getHomepage();
 		String description = newProductType.getDescription();
+		String comment = newProductType.getDescription();
 		String language = newProductType.getLanguage();
 		String subClassOf = newProductType.getSubClassOf();
 		String superClassURI = "exp"+subClassOf;
@@ -274,7 +282,7 @@ public class ProductTypesServices {
 
 			}
 
-		String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, homepage, description, language);
+		String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, name, homepage, description,comment, language);
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -314,80 +322,7 @@ public class ProductTypesServices {
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
 	}
-/*
-	public String getOffersToProducts(String productID) {
-		auth.getAuthentication();
 
-		String queryConstruct = methods.getOffersToProductsSparql(productID);
-
-		Query query = QueryFactory.create(queryConstruct);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-
-		Iterator<Triple> results= qexec.execConstructTriples();
-		
-		//Model model = ModelFactory.createDefaultModel();
-		//String gr = "http://purl.org/goodrelations/v1#";
-		//Property hasCurrencyValue = model.createProperty(gr, "hasCurrencyValue");
-		//StmtIterator cit = results.listStatements();
-		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
-		//String s = "Subject";
-		//String p = "Predicate";
-		//String o = "Object";
-		/*while(cit.hasNext()) {
-			jsonArrayAdd.add(cit.next().getResource().getURI())
-			.add(cit.next().getProperty(hasCurrencyValue).getPredicate().getURI().toString())
-			.add(cit.next().getObject().asLiteral().getFloat());
-			
-		}*/
-		/*
-		while(cit.hasNext()) {
-			Statement qs = cit.next();
-			Resource Prices = qs.getResource().asResource();
-			for ( Resource curr = Prices;
-					!RDF.nil.equals(curr);
-					curr = curr.getRequiredProperty(RDF.rest).getObject().asResource()) {
-				Resource Products = curr.getRequiredProperty(RDF.first).getObject().asResource();
-				RDFNode Price = Products.getRequiredProperty(hasCurrencyValue).getObject();
-				jsonArrayAdd.add((JsonValue) Price);
-			}
-			
-			
-		while(results.hasNext()) {
-			Triple tp = results.next();
-		
-			Object price = null;
-			Object produtoUri = null;
-			
-			Node p = NodeFactory.createURI("http://purl.org/goodrelations/v1#hasPriceSpecification");
-			if(tp.getSubject().isURI() && tp.predicateMatches(p)) {
-				produtoUri = tp.getSubject().getURI();
-			}
-			
-			if(tp.getObject().isLiteral()) {
-				 price = tp.getObject().getLiteralValue();
-			}
-			if(produtoUri != null) {
-				jsonArrayAdd.add(produtoUri.toString());
-			}
-			if (price != null) {
-				jsonArrayAdd.add(price.toString());
-				
-			}	
-		}
-		
-		
-		
-		qexec.close();
-		JsonArray ja = jsonArrayAdd.build();
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		JsonWriter writer = Json.createWriter(outputStream);
-		writer.writeArray(ja);
-		String output = new String(outputStream.toByteArray());
-
-		return output;
-	}
-}
-*/
 	public Response getOffersToProducts(String productID, String accept) {
 		auth.getAuthentication();
 
