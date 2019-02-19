@@ -181,10 +181,12 @@ public class CompanyServices {
 	String companyID = newCompany.getCompanyID();
 	String companyURL = newCompany.getCompanyURL();
 	String legalName = newCompany.getLegalName();
+	String grLegalName = newCompany.getLegalName();
 	String email = newCompany.getEmail();
 	String name = newCompany.getName();
+	String label = newCompany.getName();
 
-	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, companyURL, email, name, legalName);
+	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, companyURL, email, name, legalName, label, grLegalName);
 	
 	UpdateRequest request = UpdateFactory.create(queryUpdate);
 	UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

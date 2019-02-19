@@ -146,7 +146,134 @@ public class Methods {
 		
 		return queryDescribe;
 	}
+	public String getProductDescribe(String productID) {
+		String queryDescribe = "PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+							"\r\n"+
+							"DESCRIBE expr:"+productID+"\r\n"+
+							"WHERE\r\n"+
+							"	{\r\n"+
+							"		expr:"+productID+"	?p	?o .\r\n "+
+							"}";
+		return queryDescribe;
+	}
+	public String getProductSparqlSelect(String productID) {
+		String query = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+				"SELECT ?productName ?productLabel ?productDescription ?productComment ?productURL ?productLanguage ?productType \r\n"+
+				"WHERE\r\n"+
+					"{\r\n"+
+				"		expr:"+productID+"	rdf:type		schema:identifier, \r\n"+
+				"											?productType; \r\n"+
+				"							rdf:label	?productLabel; \r\n"+
+				"							schema:homepage	?productURL;	\r\n" + 
+				"							gr:description	?productDescription;	\r\n" +
+				"							rdfs:comment	?productComment;	\r\n"+
+				"							lang:namespacelang	?productLanguage.	\r\n" +
+				"}							";
+		return query;
+				
+	}
 	
+	public String getAllProductSparqlSelect() {
+		String query = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" + 
+				"SELECT ?product  \r\n"+
+				"WHERE \r\n"+
+				"	{\r\n"+
+				"		?product	rdf:type	schema:identifier.\r\n"+
+				//"					rdfs:subClassOf		schema:Product,\r\n"+
+				//"										gr:ProductOrService.\r\n"+
+				"	}";
+		
+		return query;
+	}
+	public String insertProductSpaqrl(String productID, String productType, String productName, String productLabel, String productDescription, String productComment, String productLanguage, String productURL) {
+		String queryInsert = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" +
+				"INSERT DATA \r\n"+
+				"	{\r\n"+
+				"		expr:"+productID+"		rdf:type		schema:identifier,\r\n"+
+				"												exp:"+productType+";\r\n"+
+				"								rdfs:label		'"+productLabel+"';\r\n"+
+				//"								schema:name		'"+productName+"'; \r\n"+
+				"								gr:description	'"+productDescription+"'; \r\n"+
+				"								rdfs:comment	'"+productComment+"'; \r\n"+
+				"								lang:namespacelang	'"+productLanguage+"'; \r\n"+
+				"								schema:url		<"+productURL+">.\r\n"+
+				"	}";
+		
+		return queryInsert;
+		
+	}
+	
+	public String updateProductSparql(String oldProductID, String productID, String productType, String productLabel, String productDescription, String productComment, String productLanguage, String productURL) {
+		String queryupdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" +
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
+				"DELETE\r\n" + 
+				"	{ exco:"+oldProductID+" ?p ?s }\r\n" + 
+				"WHERE\r\n" +
+				"	{\r\n" + 
+				"		exco:"+oldProductID+" ?p ?s;\r\n" + 
+				"					rdf:type  schema:identifier, \r\n" +
+				"								exp:"+productType+".\r\n"+
+				"};"+
+				"\r\n" + 
+				"INSERT DATA\r\n" + 
+				"	{\r\n"+
+				"		expr:"+productID+"		rdf:type		schema:identifier;\r\n"+
+				"												exp:"+productType+";\r\n"+
+				"								rdfs:label		'"+productLabel+"';\r\n"+
+				//"								schema:name		'"+productName+"'; \r\n"+
+				"								gr:description	'"+productDescription+"'; \r\n"+
+				"								rdfs:comment	'"+productComment+"'; \r\n"+
+				"								lang:namespacelang	'"+productLanguage+"'; \r\n"+
+				"								schema:url		<"+productURL+">.\r\n"+
+				"	}";
+		return queryupdate;
+	}
+	
+	public String deleteProductSparql(String productID, String productType) {
+		String queryDelete =  "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"DELETE\r\n" + 
+				"	{ exco:"+productID+" ?p ?s }\r\n" + 
+				"WHERE\r\n" +
+				"	{\r\n" + 
+				"		exco:"+productID+" ?p ?s;\r\n" + 
+				"					rdf:type  schema:identifier, \r\n" +
+				"								exp:"+productType+".\r\n"+
+				"}";
+		return queryDelete;
+	}
 	public String getOfferSparqlDescribe(String companyID, String productID) {
 		String queryDescribe = "DESCRIBE <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/"+productID+">\r\n";
 		
@@ -262,6 +389,20 @@ public class Methods {
 				
 	}
 	
+	public String getAllCompaniesSparqlSelect() {
+		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"\r\n" + 
+				"SELECT ?company\r\n" + 
+				"WHERE\r\n" + 
+				"{\r\n" + 
+				"?company rdf:type gr:BusinessEntity .\r\n" + 
+				"}\r\n" + 
+				"";
+		
+		return querySelect;
+	}
+	
 	public String deleteAllOffers() {
 		String deleteQuery = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
@@ -358,19 +499,6 @@ public class Methods {
 		return queryDeleteAll;
 	}
 	
-	public String getAllCompaniesSparqlSelect() {
-		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"\r\n" + 
-				"SELECT ?company\r\n" + 
-				"WHERE\r\n" + 
-				"{\r\n" + 
-				"?company rdf:type gr:BusinessEntity .\r\n" + 
-				"}\r\n" + 
-				"";
-		
-		return querySelect;
-	}
 	
 	public String getAllOffersSparqlSelect(String companyID) {
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
@@ -556,6 +684,9 @@ public class Methods {
 
 		return querySelect;
 	}
+
+	
+	
 
 	
 }
