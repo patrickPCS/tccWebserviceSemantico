@@ -30,19 +30,6 @@ public class ProductTypeResources {
 		return prodServ.getAllProductTypes();		
     }
 	
-	@GET
-	@Path("/{ProductID}/offers")
-	@Produces({"application/json", 
-	    	"application/ld+json",
-	    	"application/n-triples",
-	    	"application/rdf+xml",
-	    	"application/turtle",
-	    	"application/rdf+json"
-	    	})
-    public Response listarOfertasParaProdutos(@PathParam("ProductID") String productID, @HeaderParam("Accept") String accept) {		
-		return prodServ.getOffersToProducts(productID, accept);		
-    }
-	
 	@DELETE
 	public Response deletarProdutos() {
 		prodServ.deleteAllProductsTypes();

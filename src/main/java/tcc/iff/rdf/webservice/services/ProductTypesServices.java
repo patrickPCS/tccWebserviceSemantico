@@ -322,28 +322,7 @@ public class ProductTypesServices {
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
 	}
-
-	public Response getOffersToProducts(String productID, String accept) {
-		auth.getAuthentication();
-
-		String queryDescribe = methods.getOffersToProductsSparql(productID);
-		
-		Query query = QueryFactory.create(queryDescribe);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-		Model results = qexec.execDescribe();
-		
-		String format = methods.convertFromAcceptToFormat(accept);
-
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		results.write(outputStream, format);
-		String output = new String(outputStream.toByteArray());
-
-		return Response.status(Response.Status.OK)
-				.entity(output)
-				.build();
-		
-		}
-	}
+}
 
 
 

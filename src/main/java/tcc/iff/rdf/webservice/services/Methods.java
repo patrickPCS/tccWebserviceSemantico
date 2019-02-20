@@ -303,7 +303,9 @@ public class Methods {
 		String query = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" +
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
+				"PREFIX pto: <http://www.productontology.org/id/>\r\n" +
 				"\r\n" + 
 				"SELECT ?ProductTypes \r\n" + 
 				"WHERE {?ProductTypes   	 rdf:type			owl:Class;\r\n" + 
@@ -392,11 +394,14 @@ public class Methods {
 	public String getAllCompaniesSparqlSelect() {
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
 				"\r\n" + 
 				"SELECT ?company\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?company rdf:type gr:BusinessEntity .\r\n" + 
+				"?company		rdf:type 	schema:identifier,"+
+				"							gr:BusinessEntity .\r\n" + 
 				"}\r\n" + 
 				"";
 		
@@ -411,15 +416,17 @@ public class Methods {
 				"DELETE {?company	gr:offers     ?Offers }\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?company	gr:offers     ?Offers    .\r\n" +
+				"?company	gr:offers		?Offers"+
+				"?Offers 	rdf:type	schema:identifier.\r\n" +
 				"};\r\n" + 
 				
 				"\r\n" + 
 				"DELETE {?Offer	?p     ?o }\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?Offer	?p     ?o;"
-				+ "		gr:BusinessEntity	?company .\r\n" +
+				"?Offer	?p     ?o;"+
+				"		rdf:type	schema:identifier;"+
+				"		gr:BusinessEntity	?company .\r\n" +
 				"}\r\n" + 
 				"";
 		
@@ -429,35 +436,44 @@ public class Methods {
 	public String deleteCompanySparql(String companyID) {
 		String queryDelete = "PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +  
 				"\r\n" + 
 				"DELETE \r\n" + 
 				"	{ exco:"+companyID+" ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"  exco:"+companyID+" ?p ?s; .\r\n" + 
+				"  exco:"+companyID+" rdf:type schema:identifier; .\r\n" + 
 				"}\r\n" + 
 				"";
-		
+	
 		return queryDelete;
 	}
 	
 	public String deleteProducttypeSparql(String id) {
-		String queryDelete = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+		String queryDelete = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" +  
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
 				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
-				"PREFIX lang: <http://www.w3.org/XML/1998/>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
-				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
 				"	{ exp:"+id+" ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
 				"  exp:"+id+"	  	?p ?s;" +
-				" rdf:type			owl:Class;\r\n" + 
-				"			 rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
+				" 				rdf:type		schema:identifier,"+
+				"								owl:Class;\r\n" + 
+				"			 	rdfs:subClassOf		<http://schema.org/Product> .\r\n" + 
 				"}";
 		
 		return queryDelete;
@@ -493,7 +509,7 @@ public class Methods {
 				"WHERE\r\n" + 
 				"{\r\n" + 
 				"?companyURL ?p ?s;\r\n" + 
-				"rdf:type  gr:BusinessEntity .\r\n" + 
+				"		rdf:type  gr:BusinessEntity .\r\n" + 
 				"}";
 		
 		return queryDeleteAll;
@@ -502,53 +518,72 @@ public class Methods {
 	
 	public String getAllOffersSparqlSelect(String companyID) {
 		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +  
 				"\r\n" + 
 				"SELECT ?Offers\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"exco:"+companyID+"	gr:offers     ?Offers    .\r\n" + 
+				"exco:"+companyID+"	rdf:type schema:identifier;"+ 
+				"					gr:offers		?Offers;"+
+				//"    	?Offer		gr:includes		?product.\r\n" + 
 				"}\r\n" + 
 				"";
 		return querySelect;
 	}
 	
-	public String insertOfferSparql(String companyID, String productID, String offerURI, String validFrom, String validThrough, String hasCurrency, String price) {
+	public String insertOfferSparql(String offerID, String productID, String companyID, String offerURI, String validFrom, String validThrough, String hasCurrency, String price, String comment, String description, String language) {
 		String queryInsert = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
 				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  exo:"+productID+"	rdf:type		gr:Offering;\r\n" + 
-				"                        gr:includes      exp:"+productID+";\r\n" + 
-				"	gr:BusinessEntity     exco:"+companyID+";\r\n" + 
-				"	foaf:page     <"+offerURI+">;\r\n" + 
-				"	gr:hasBusinessFunction gr:Sell ;\r\n" + 
-				"	gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
-				"	gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
-				"	gr:hasPriceSpecification\r\n" + 
-				"         [ a gr:UnitPriceSpecification ;\r\n" + 
-				"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-				"           gr:hasCurrencyValue '"+price+"'^^xsd:float;\r\n" + 
-				"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
-				"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
+				"  exo:"+offerID+"	rdf:type		schema:identifier,\r\n"+
+				"									gr:Offering;\r\n" + 
+				"                   gr:includes      expr:"+productID+";\r\n" + 
+				"					gr:BusinessEntity     exco:"+companyID+";\r\n" + 
+				"					foaf:url     <"+offerURI+">;\r\n" + 
+				"					gr:hasBusinessFunction gr:Sell ;\r\n" + 
+				"					gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
+				"					gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
+				"					gr:hasPriceSpecification\r\n" + 
+				"         				[ a gr:UnitPriceSpecification ;\r\n" + 
+				"           				gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
+				"           			gr:hasCurrencyValue '"+price+"'^^xsd:float;\r\n" + 
+				"           		gr:validThrough '"+validThrough+"'^^xsd:dateTime ];\r\n"+
+				"					gr:description		'"+description+"';\r\n" +
+				"					rdfs:comment		'"+comment+"';\r\n"+
+				"					schema:language		'"+language+"'.\r\n"+
+				"  exco:"+companyID+"	gr:offers		exo:"+offerID+" .\r\n" + 
 				"}";
 		return queryInsert;
 	}
 		
-	public String updateOfferSparql(String oldOfferID, String companyID, String productID, String offerURI, String validFrom, String validThrough, String hasCurrency, String price) {
+	public String updateOfferSparql(String oldOfferID, String offerID, String productID, String companyID, String offerURI, String validFrom, String validThrough, String hasCurrency, String price, String comment, String description, String language) {
 		String queryUpdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" +
 				"PREFIX foaf: <http://xmlns.com/foaf/0.1/> \r\n" + 
 				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
 				"	{ exo:"+oldOfferID+" ?p ?s }\r\n" + 
@@ -560,42 +595,54 @@ public class Methods {
 				"\r\n" + 
 				"INSERT DATA\r\n" + 
 				"{ \r\n" + 
-				"  exo:"+productID+"	rdf:type		gr:Offering;\r\n" + 
-				"                        gr:includes      exp:"+productID+";\r\n" + 
-				"	gr:BusinessEntity     exco:"+companyID+";\r\n" + 
-				"	foaf:page     <"+offerURI+">;\r\n" + 
-				"	gr:hasBusinessFunction gr:Sell ;\r\n" + 
-				"	gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
-				"	gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
-				"	gr:hasPriceSpecification\r\n" + 
-				"         [ rdf:type gr:UnitPriceSpecification ;\r\n" + 
-				"           gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-				"           gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
-				"           gr:validThrough '"+validThrough+"'^^xsd:dateTime ] .   \r\n" +
-				"  exco:"+companyID+"	gr:offers		exo:"+productID+" .\r\n" + 
+				"  exo:"+offerID+"	rdf:type			schema:identifier,\r\n"+ 
+				"										gr:Offering;\r\n" + 
+				"                       gr:includes      expr:"+productID+";\r\n" + 
+				"						gr:BusinessEntity     exco:"+companyID+";\r\n" + 
+				"						schema:url    <"+offerURI+">;\r\n" + 
+				"						gr:hasBusinessFunction gr:Sell ;\r\n" + 
+				"						gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
+				"						gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
+				"						gr:hasPriceSpecification\r\n" + 
+				"         					[ rdf:type gr:UnitPriceSpecification ;\r\n" + 
+				"           					gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
+				"           					gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
+				"           					gr:validThrough '"+validThrough+"'^^xsd:dateTime ];\r\n" +
+				"						gr:description		'"+description+"';\r\n" +
+				"						rdfs:comment		'"+comment+"';\r\n"+
+				"						schema:language		'"+language+"'.\r\n"+
+				"  exco:"+companyID+"	gr:offers		exo:"+offerID+" .\r\n" + 
 				"}";
 		
 		return queryUpdate;
 	}
 	
 	public String deleteOfferSparql(String companyID, String offerID) {
-		String queryDelete = "PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+		String queryDelete ="PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
 				"\r\n" + 
 				"DELETE \r\n" + 
 				"	{ exo:"+offerID+" ?p ?s }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
 				"  exo:"+offerID+" ?p ?s;\r\n" +
-				" 		rdf:type gr:Offering .\r\n" + 
+				" 		rdf:type 	schema:identifier,\r\n"+
+				"					gr:Offering .\r\n" + 
 				"};\r\n" + 
 				"\r\n" + 
 				"DELETE {exco:"+companyID+"	gr:offers     exo:"+offerID+" }\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"exco:"+companyID+"	gr:offers     exo:"+offerID+"    .\r\n" +
+				"	exco:"+companyID+"		rdf:type	schema:identifier;\r\n"+
+				"	exo:"+offerID+"			rdf:type	schema:identifier;\r\n"+
+				"	exco:"+companyID+"		gr:offers	exo:"+offerID+"    .\r\n" +
 				"}";
 		
 		return queryDelete;
@@ -603,9 +650,14 @@ public class Methods {
 	
 	public String deleteAllOffersSparql(String companyID) {
 		String queryDelete = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"\r\n" + 
 				"DELETE {exco:"+companyID+"	gr:offers     ?Offers }\r\n" + 
 				"WHERE\r\n" + 
@@ -616,9 +668,10 @@ public class Methods {
 				"	{ ?offers ?p ?o }\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"?offers ?p ?o;\r\n" +
-				"rdf:type gr:Offering;\r\n" +
-				"		gr:BusinessEntity		exco:"+companyID+".\r\n"+
+				"?offers	?p					?o;\r\n" +
+				"			rdf:type 			schema:identifier,\r\n"+
+				"								gr:Offering;\r\n" +
+				"			gr:BusinessEntity	exco:"+companyID+".\r\n"+
 				"}";
 		
 		return queryDelete;
@@ -626,12 +679,16 @@ public class Methods {
 	
 	public String getOffersToProductsSparql(String productID) {
 		String queryDescribe = 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" +
-				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
-				"PREFIX owl: <http://www.w3.org/2002/07/owl#>\r\n" + 
+				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" +  
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
+				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +  
 						"\r\n" + 
-				"DESCRIBE exp:"+productID+" WHERE { ?Companies gr:includes exp:"+productID+";\n" + 
+				"DESCRIBE expr:"+productID+" WHERE { ?Companies gr:includes expr:"+productID+";\n" + 
 				"                                         gr:hasPriceSpecification [rdf:type gr:UnitPriceSpecification;\n" + 
 				"                                                                  gr:hasCurrencyValue ?price]}\n" + 
 				"\n" + 
@@ -655,20 +712,23 @@ public class Methods {
 	}
 
 	public String getOfferSparqlSelect(String companyID, String offerID) {
-		String querySelect = "PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
-				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" + 
-				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/>\r\n" + 
-				"PREFIX foaf: <http://xmlns.com/foaf/0.1/>\r\n" + 
-				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\r\n" + 
+		String querySelect = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
+				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
+				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
+				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
+				"PREFIX exco: <http://localhost:8080/webservice/webapi/companies/>\r\n" +
+				"PREFIX schema: <http://schema.org/>\r\n" +
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\n" + 
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>  \r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
-				"PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"\r\n" + 
 				"SELECT ?offerURI ?validFrom ?validThrough ?hasCurrency ?price ?companyID\r\n" + 
 				"\r\n" + 
 				"WHERE\r\n" + 
 				"{ \r\n" + 
-				"  exo:"+offerID+" rdf:type gr:Offering;\r\n" + 
-				"         foaf:page	?offerURI;\r\n" + 
+				"  exo:"+offerID+" rdf:type  schema:identifier,\r\n"+
+				"								gr:Offering;\r\n" + 
+				"         schema:url	?offerURI;\r\n" + 
 		//		"         gr:validFrom		?validFrom;\r\n" + 
 				"         gr:BusinessEntity	?companyID .\r\n" + 
 			//	"         gr:validThrough		?validThrough .\r\n" + 

@@ -5,14 +5,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Offer {
 	
-	private String offerID;
+	private String offerID; // id da oferta
 	private String offerURI; //pagina da oferta
 	private String includes; //produto que essa oferta inclui
 	private String validFrom; //valido a partir de
 	private String validThrough; //valido até
 	private String hasCurrency; //moeda (USD, BRL)
 	private String price;	// ex.: 19.90
-	private String companyID; 
+	private String companyID;
+	private String description;
+	private String language;
+	
 	
 	public String getCompanyID() {
 		return companyID;
@@ -62,6 +65,18 @@ public class Offer {
 	}
 	public void setPrice(String price) {
 		this.price = price;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getLanguage() {
+		return language;
+	}
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 	
 	

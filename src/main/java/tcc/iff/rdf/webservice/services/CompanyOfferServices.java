@@ -133,14 +133,18 @@ public class CompanyOfferServices {
 		String exo = "http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/";
 		for(int i=0; i<TAM; i++) {
 
+			String offerID = OfferList.get(i).getOfferID();
 			String offerURI = OfferList.get(i).getOfferURI();
 			String productID = OfferList.get(i).getIncludes();
 			String validFrom = OfferList.get(i).getValidFrom();
 			String validThrough = OfferList.get(i).getValidThrough();
 			String hasCurrency = OfferList.get(i).getHasCurrency();
 			String price = OfferList.get(i).getPrice();
+			String comment = OfferList.get(i).getDescription();
+			String description = OfferList.get(i).getDescription();
+			String language = OfferList.get(i).getLanguage();
 
-			String queryDescribe = methods.getOfferSparqlDescribe(companyID, productID);
+			String queryDescribe = methods.getOfferSparqlDescribe(companyID, offerID);
 
 			Query query = QueryFactory.create(queryDescribe);
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
@@ -149,17 +153,17 @@ public class CompanyOfferServices {
 
 			if (results.isEmpty()) {
 
-				String queryUpdate = methods.insertOfferSparql(companyID, productID, offerURI, validFrom, validThrough, hasCurrency, price);
+				String queryUpdate = methods.insertOfferSparql(offerID, productID, companyID, offerURI, validFrom, validThrough, hasCurrency, price, comment, description, language);
 
 				UpdateRequest request = UpdateFactory.create(queryUpdate);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 				up.execute();
 
-				jsonArrayAdd.add(exo+productID);
+				jsonArrayAdd.add(exo+offerID);
 			}
 			else
 			{
-				String message = "CONFLICT: the "+productID+" Offering already exists: "+exo+productID;
+				String message = "CONFLICT: the "+productID+" Offering already exists: "+exo+offerID;
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				String output = new String(outputStream.toByteArray());
 				output = message;
@@ -185,21 +189,25 @@ public class CompanyOfferServices {
 		
 		String exo = "http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/";
 		
+		String offerID = updatedOffer.getOfferID();
 		String offerURI = updatedOffer.getOfferURI();
 		String productID = updatedOffer.getIncludes();
 		String validFrom = updatedOffer.getValidFrom();
 		String validThrough = updatedOffer.getValidThrough();
 		String hasCurrency = updatedOffer.getHasCurrency();
 		String price = updatedOffer.getPrice();
+		String comment = updatedOffer.getDescription();
+		String description = updatedOffer.getDescription();
+		String language = updatedOffer.getLanguage();
 
-		String queryUpdate = methods.updateOfferSparql(oldOfferID, companyID, productID, offerURI, validFrom, validThrough, hasCurrency, price);
+		String queryUpdate = methods.updateOfferSparql(oldOfferID, offerID, productID, companyID, offerURI, validFrom, validThrough, hasCurrency, price, comment, description, language);
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
 		
 		JsonArrayBuilder jsonArrayAdd = Json.createArrayBuilder();
-		jsonArrayAdd.add(exo+productID);
+		jsonArrayAdd.add(exo+offerID);
 		JsonArray ja = jsonArrayAdd.build();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		JsonWriter writer = Json.createWriter(outputStream);

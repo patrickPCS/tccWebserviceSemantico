@@ -40,6 +40,18 @@ public class ProductResoures {
 		return product.getProduct(productID, accept);
 	}
 	
+	@GET 
+	@Path("/{ProductID}/offers")
+	@Produces({"application/json", 
+	    	"application/ld+json",
+	    	"application/n-triples",
+	    	"application/rdf+xml",
+	    	"application/turtle",
+	    	"application/rdf+json"
+	    	})
+    public Response listarOfertasParaProdutos(@PathParam("ProductID") String productID, @HeaderParam("Accept") String accept) {		
+		return product.getOffersToProducts(productID, accept);		
+    }
 	@DELETE
 	@Path("/{productID}")
 	public Response deletarEmpresa(@PathParam("productID") String productID) {
