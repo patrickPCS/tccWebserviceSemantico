@@ -5,7 +5,6 @@ public class ProductType {
 	private String id;
 	private String label;
 	private String homepage;
-	private String language;
 	private String description;
 	private String subClassOf;
 	
@@ -32,12 +31,6 @@ public class ProductType {
 	}
 	public void setHomepage(String homepage) {
 		this.homepage = homepage;
-	}
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 	public String getDescription() {
 		return description;

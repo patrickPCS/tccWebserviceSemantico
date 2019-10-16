@@ -1,6 +1,7 @@
 package tcc.iff.rdf.webservice.services;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.jena.query.Query;
@@ -82,7 +83,7 @@ public class CompanyOfferServices {
 			
 			
 			QuerySolution soln = results.nextSolution() ;
-			String offerURI = soln.getResource("offerURI").toString() ;  
+			String offerURI = soln.getResource("offerPage").toString() ;  
 			//String validFrom = soln.getLiteral("validFrom").getDatatypeURI().replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "").toString();
 			//String validThrough = soln.getLiteral("validThrough").getDatatypeURI().replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "").toString();
 			String hasCurrency = soln.getLiteral("hasCurrency").toString();
@@ -91,7 +92,7 @@ public class CompanyOfferServices {
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("offerID", offerID)
 					.add("companyID", companyID)
-					.add("offerURI",offerURI)
+					.add("offerPage",offerURI)
 					//.add("validFrom",validFrom)
 					//.add("validThrough",validThrough)
 					.add("hasCurrency",hasCurrency)
@@ -134,15 +135,14 @@ public class CompanyOfferServices {
 		for(int i=0; i<TAM; i++) {
 
 			String offerID = OfferList.get(i).getOfferID();
-			String offerURI = OfferList.get(i).getOfferURI();
+			String offerPage = OfferList.get(i).getOfferPage();
 			String productID = OfferList.get(i).getIncludes();
-			String validFrom = OfferList.get(i).getValidFrom();
-			String validThrough = OfferList.get(i).getValidThrough();
+			Date validFrom = OfferList.get(i).getValidFrom();
+			Date validThrough = OfferList.get(i).getValidThrough();
 			String hasCurrency = OfferList.get(i).getHasCurrency();
-			String price = OfferList.get(i).getPrice();
+			float price = OfferList.get(i).getPrice();
 			String comment = OfferList.get(i).getDescription();
 			String description = OfferList.get(i).getDescription();
-			String language = OfferList.get(i).getLanguage();
 
 			String queryDescribe = methods.getOfferSparqlDescribe(companyID, offerID);
 
@@ -153,7 +153,7 @@ public class CompanyOfferServices {
 
 			if (results.isEmpty()) {
 
-				String queryUpdate = methods.insertOfferSparql(offerID, productID, companyID, offerURI, validFrom, validThrough, hasCurrency, price, comment, description, language);
+				String queryUpdate = methods.insertOfferSparql(offerID, productID, companyID, offerPage, validFrom, validThrough, hasCurrency, price, comment, description);
 
 				UpdateRequest request = UpdateFactory.create(queryUpdate);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -190,17 +190,16 @@ public class CompanyOfferServices {
 		String exo = "http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/";
 		
 		String offerID = updatedOffer.getOfferID();
-		String offerURI = updatedOffer.getOfferURI();
+		String offerPage = updatedOffer.getOfferPage();
 		String productID = updatedOffer.getIncludes();
-		String validFrom = updatedOffer.getValidFrom();
-		String validThrough = updatedOffer.getValidThrough();
+		Date validFrom = updatedOffer.getValidFrom();
+		Date validThrough = updatedOffer.getValidThrough();
 		String hasCurrency = updatedOffer.getHasCurrency();
-		String price = updatedOffer.getPrice();
+		float price = updatedOffer.getPrice();
 		String comment = updatedOffer.getDescription();
 		String description = updatedOffer.getDescription();
-		String language = updatedOffer.getLanguage();
 
-		String queryUpdate = methods.updateOfferSparql(oldOfferID, offerID, productID, companyID, offerURI, validFrom, validThrough, hasCurrency, price, comment, description, language);
+		String queryUpdate = methods.updateOfferSparql(oldOfferID, offerID, productID, companyID, offerPage, validFrom, validThrough, hasCurrency, price, comment, description);
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

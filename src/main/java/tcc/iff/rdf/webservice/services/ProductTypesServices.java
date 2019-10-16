@@ -98,7 +98,6 @@ public class ProductTypesServices {
 			String label = soln.getLiteral("label").toString() ;
 			//String name = soln.getLiteral("name").toString();
 			String homepage = soln.getResource("homepage").toString() ;
-			String language = soln.getLiteral("language").toString() ;
 			String description = soln.getLiteral("description").toString() ;
 			String comment = soln.getLiteral("comment").toString();
 			String subClassOf = soln.getResource("subClassOf").toString() ;
@@ -108,7 +107,6 @@ public class ProductTypesServices {
 					.add("label",label)
 					//.add("name", name)
 					.add("homepage",homepage)
-					.add("language",language)
 					.add("description",description)
 					.add("comment",comment)
 					.add("subClassOf", subClassOf)
@@ -154,7 +152,6 @@ public class ProductTypesServices {
 			String homepage = newProductType.get(i).getHomepage();
 			String description = newProductType.get(i).getDescription();
 			String comment = newProductType.get(i).getDescription();
-			String language = newProductType.get(i).getLanguage();
 			String subClassOf = newProductType.get(i).getSubClassOf();
 			String superClassURI = "exp:"+subClassOf+"";
 
@@ -202,7 +199,7 @@ public class ProductTypesServices {
 			Model resultados = qex.execDescribe();
 			if (resultados.isEmpty()) {
 
-				String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, name, homepage, description, comment,  language);
+				String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, name, homepage, description, comment);
 
 				UpdateRequest request = UpdateFactory.create(queryUpdate);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -243,7 +240,6 @@ public class ProductTypesServices {
 		String homepage = newProductType.getHomepage();
 		String description = newProductType.getDescription();
 		String comment = newProductType.getDescription();
-		String language = newProductType.getLanguage();
 		String subClassOf = newProductType.getSubClassOf();
 		String superClassURI = "exp"+subClassOf;
 
@@ -282,7 +278,7 @@ public class ProductTypesServices {
 
 			}
 
-		String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, name, homepage, description,comment, language);
+		String queryUpdate = methods.insertProducttypeSparql(id, superClassURI, label, name, homepage, description,comment);
 
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

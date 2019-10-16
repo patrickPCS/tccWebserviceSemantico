@@ -1,5 +1,7 @@
 package tcc.iff.rdf.webservice.services;
 
+import java.util.Date;
+
 public class Methods {
 	
     public final static String URIBASE = "http://localhost:8080/webservice/webapi";
@@ -36,7 +38,7 @@ public class Methods {
 			return false;
 	}
 	
-	public String insertProducttypeSparql(String id, String superClassURI, String label,  String name, String homepage, String description, String comment, String language) {
+	public String insertProducttypeSparql(String id, String superClassURI, String label,  String name, String homepage, String description, String comment) {
 		String queryInsert = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" +
 				"PREFIX schema: <http://schema.org/>\r\n" +
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
@@ -60,8 +62,7 @@ public class Methods {
 				//"				schema:name			'"+name+"';\r\n"+
 				"				schema:homepage		<"+homepage+">;\r\n" + 
 				"				gr:description		'"+description+"';\r\n" +
-				"				rdfs:comment		'"+comment+"';\r\n"+				
-				"				lang:namespacelang	'"+language+"' .\r\n" + 
+				"				rdfs:comment		'"+comment+"';\r\n"+				 
 				"			\r\n" + 
 				"}		\r\n" + 
 				"";
@@ -87,8 +88,7 @@ public class Methods {
 				//"								schema:name		?name;	\r\n"+
 				"								schema:homepage	?homepage;	\r\n" + 
 				"								gr:description	?description;	\r\n" +
-				"								rdfs:comment	?comment;	\r\n"+
-				"								lang:namespacelang	?language.	\r\n" + 
+				"								rdfs:comment	?comment;	\r\n"+ 
 				"    \r\n" + 
 				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), 'http://www.productontology.org/id/')}\r\n" + 
 				" 			OPTIONAL {  exp:"+productTypeID+" rdfs:subClassOf	?subClassOf . FILTER regex(str(?subClassOf), '/producttypes/')}\r\n" + 
@@ -199,7 +199,7 @@ public class Methods {
 		
 		return query;
 	}
-	public String insertProductSpaqrl(String productID, String productType, String productName, String productLabel, String productDescription, String productComment, String productLanguage, String productURL) {
+	public String insertProductSpaqrl(String productID, String productType, String productName, String productLabel, String productDescription, String productComment, String productPage) {
 		String queryInsert = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX schema: <http://schema.org/>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
@@ -215,16 +215,15 @@ public class Methods {
 				"								rdfs:label		'"+productLabel+"';\r\n"+
 				//"								schema:name		'"+productName+"'; \r\n"+
 				"								gr:description	'"+productDescription+"'; \r\n"+
-				"								rdfs:comment	'"+productComment+"'; \r\n"+
-				"								lang:namespacelang	'"+productLanguage+"'; \r\n"+
-				"								schema:url		<"+productURL+">.\r\n"+
+				"								rdfs:comment	'"+productComment+"'; \r\n"+				
+				"								schema:url		<"+productPage+">.\r\n"+
 				"	}";
 		
 		return queryInsert;
 		
 	}
 	
-	public String updateProductSparql(String oldProductID, String productID, String productType, String productLabel, String productDescription, String productComment, String productLanguage, String productURL) {
+	public String updateProductSparql(String oldProductID, String productID, String productType, String productLabel,String productDescription, String productComment, String productPage) {
 		String queryupdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX schema: <http://schema.org/>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
@@ -251,13 +250,12 @@ public class Methods {
 				//"								schema:name		'"+productName+"'; \r\n"+
 				"								gr:description	'"+productDescription+"'; \r\n"+
 				"								rdfs:comment	'"+productComment+"'; \r\n"+
-				"								lang:namespacelang	'"+productLanguage+"'; \r\n"+
-				"								schema:url		<"+productURL+">.\r\n"+
+				"								schema:url		<"+productPage+">.\r\n"+
 				"	}";
 		return queryupdate;
 	}
 	
-	public String deleteProductSparql(String productID, String productType) {
+	public String deleteProductSparql(String productID) {
 		String queryDelete =  "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX schema: <http://schema.org/>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
@@ -265,12 +263,11 @@ public class Methods {
 				"PREFIX expr: <http://localhost:8080/webservice/webapi/products/>\r\n"+
 				"PREFIX exp: <http://localhost:8080/webservice/webapi/producttypes/> \r\n" + 
 				"DELETE\r\n" + 
-				"	{ exco:"+productID+" ?p ?s }\r\n" + 
+				"	{ expr:"+productID+" ?p ?s }\r\n" + 
 				"WHERE\r\n" +
 				"	{\r\n" + 
-				"		exco:"+productID+" ?p ?s;\r\n" + 
-				"					rdf:type  schema:identifier, \r\n" +
-				"								exp:"+productType+".\r\n"+
+				"		expr:"+productID+" ?p ?s;\r\n" + 
+				"					rdf:type  schema:identifier. \r\n" +
 				"}";
 		return queryDelete;
 	}
@@ -338,7 +335,7 @@ public class Methods {
 		return query;
 	}
 	
-	public String insertCompanySparql(String companyID, String name, String legalName, String grLegalName, String companyURL, String email) {
+	public String insertCompanySparql(String companyID, String name, String legalName, String grLegalName, String homePage, String email) {
 		String queryInsert = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX schema: <http://schema.org/>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
@@ -354,14 +351,14 @@ public class Methods {
 				"						rdfs:label   		'"+name+"';\r\n"+
 				"						schema:legalName	'"+legalName+"';\r\n"+
 				"						gr:legalName		'"+grLegalName+"';\r\n"+
-				"						schema:url			"+companyURL+";\r\n"+ 
+				"						schema:url			"+homePage+";\r\n"+ 
 				"						schema:email		'"+email+"'.\r\n"+  
 				"}";
 		
 		return queryInsert;
 	}
 	
-	public String updateCompanySparql(String oldCompanyID, String companyID, String name, String label, String legalName, String grLegalName, String companyURL, String email) {
+	public String updateCompanySparql(String oldCompanyID, String companyID, String name, String label, String legalName, String grLegalName, String homePage, String email) {
 		String queryUpdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX schema: <http://schema.org/>\r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" +
@@ -384,7 +381,7 @@ public class Methods {
 				"						rdfs:label   		'"+name+"'; 		\r\n"+
 				"						schema:legalName	'"+legalName+"';	\r\n"+
 				"						gr:legalName		'"+legalName+"';	\r\n"+
-				"						schema:url			<"+companyURL+">;	\r\n"+ 
+				"						schema:url			<"+homePage+">;	\r\n"+ 
 				"						schema:email		'"+email+"'.		\r\n"+
 				"}";
 		return queryUpdate;
@@ -412,12 +409,13 @@ public class Methods {
 		String deleteQuery = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exco:<http://localhost:8080/webservice/webapi/companies/> \r\n" + 
 				"PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + 
+				"PREFIX schema: <http://schema.org/>\r\n" +
 				"\r\n" + 
 				"DELETE {?company	gr:offers     ?Offers }\r\n" + 
 				"WHERE\r\n" + 
 				"{\r\n" + 
-				"?company	gr:offers		?Offers"+
-				"?Offers 	rdf:type	schema:identifier.\r\n" +
+				"?company	gr:offers		?Offers ;"+
+				//"?Offers 	rdf:type	schema:identifier.\r\n" +
 				"};\r\n" + 
 				
 				"\r\n" + 
@@ -425,7 +423,7 @@ public class Methods {
 				"WHERE\r\n" + 
 				"{\r\n" + 
 				"?Offer	?p     ?o;"+
-				"		rdf:type	schema:identifier;"+
+				//"		rdf:type	schema:identifier;"+
 				"		gr:BusinessEntity	?company .\r\n" +
 				"}\r\n" + 
 				"";
@@ -538,7 +536,7 @@ public class Methods {
 		return querySelect;
 	}
 	
-	public String insertOfferSparql(String offerID, String productID, String companyID, String offerURI, String validFrom, String validThrough, String hasCurrency, String price, String comment, String description, String language) {
+	public String insertOfferSparql(String offerID, String productID, String companyID, String offerPage, Date validFrom, Date validThrough, String hasCurrency, float price, String comment, String description) {
 		String queryInsert = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
 				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
@@ -556,24 +554,23 @@ public class Methods {
 				"									gr:Offering;\r\n" + 
 				"                   gr:includes      expr:"+productID+";\r\n" + 
 				"					gr:BusinessEntity     exco:"+companyID+";\r\n" + 
-				"					foaf:url     <"+offerURI+">;\r\n" + 
+				"					foaf:url     <"+offerPage+">;\r\n" + 
 				"					gr:hasBusinessFunction gr:Sell ;\r\n" + 
-				"					gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
-				"					gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
+				"					gr:validFrom '"+validFrom+"' ;\r\n" + 
+				"					gr:validThrough '"+validThrough+"' ;\r\n" + 
 				"					gr:hasPriceSpecification\r\n" + 
 				"         				[ a gr:UnitPriceSpecification ;\r\n" + 
 				"           				gr:hasCurrency '"+hasCurrency+"'^^xsd:string ;\r\n" + 
-				"           			gr:hasCurrencyValue '"+price+"'^^xsd:float;\r\n" + 
-				"           		gr:validThrough '"+validThrough+"'^^xsd:dateTime ];\r\n"+
+				"           			gr:hasCurrencyValue '"+price+"';\r\n" + 
+				"           		gr:validThrough '"+validThrough+"' ];\r\n"+
 				"					gr:description		'"+description+"';\r\n" +
-				"					rdfs:comment		'"+comment+"';\r\n"+
-				"					schema:language		'"+language+"'.\r\n"+
+				"					rdfs:comment		'"+comment+"'.\r\n"+
 				"  exco:"+companyID+"	gr:offers		exo:"+offerID+" .\r\n" + 
 				"}";
 		return queryInsert;
 	}
 		
-	public String updateOfferSparql(String oldOfferID, String offerID, String productID, String companyID, String offerURI, String validFrom, String validThrough, String hasCurrency, String price, String comment, String description, String language) {
+	public String updateOfferSparql(String oldOfferID, String offerID, String productID, String companyID, String offerPage, Date validFrom, Date validThrough, String hasCurrency, float price, String comment, String description) {
 		String queryUpdate = "PREFIX gr: <http://purl.org/goodrelations/v1#>\r\n" + 
 				"PREFIX exo: <http://localhost:8080/webservice/webapi/companies/"+companyID+"/offers/>\r\n" + 
 				"PREFIX exp: <http://localhost:8080/webservice/webapi/products/>\r\n" +
@@ -599,7 +596,7 @@ public class Methods {
 				"										gr:Offering;\r\n" + 
 				"                       gr:includes      expr:"+productID+";\r\n" + 
 				"						gr:BusinessEntity     exco:"+companyID+";\r\n" + 
-				"						schema:url    <"+offerURI+">;\r\n" + 
+				"						schema:url    <"+offerPage+">;\r\n" + 
 				"						gr:hasBusinessFunction gr:Sell ;\r\n" + 
 				"						gr:validFrom '"+validFrom+"'^^xsd:dateTime ;\r\n" + 
 				"						gr:validThrough '"+validThrough+"'^^xsd:dateTime ;\r\n" + 
@@ -609,8 +606,7 @@ public class Methods {
 				"           					gr:hasCurrencyValue '"+price+"'^^xsd:float ;\r\n" + 
 				"           					gr:validThrough '"+validThrough+"'^^xsd:dateTime ];\r\n" +
 				"						gr:description		'"+description+"';\r\n" +
-				"						rdfs:comment		'"+comment+"';\r\n"+
-				"						schema:language		'"+language+"'.\r\n"+
+				"						rdfs:comment		'"+comment+"'.\r\n"+
 				"  exco:"+companyID+"	gr:offers		exo:"+offerID+" .\r\n" + 
 				"}";
 		

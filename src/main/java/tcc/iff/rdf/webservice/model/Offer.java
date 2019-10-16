@@ -1,20 +1,22 @@
 package tcc.iff.rdf.webservice.model;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Offer {
 	
+	
 	private String offerID; // id da oferta
-	private String offerURI; //pagina da oferta
+	private String offerPage; //pagina da oferta
 	private String includes; //produto que essa oferta inclui
-	private String validFrom; //valido a partir de
-	private String validThrough; //valido até
+	private Date validFrom; //valido a partir de
+	private Date validThrough; //valido até
 	private String hasCurrency; //moeda (USD, BRL)
-	private String price;	// ex.: 19.90
+	private float price;	// ex.: 19.90
 	private String companyID;
 	private String description;
-	private String language;
 	
 	
 	public String getCompanyID() {
@@ -30,11 +32,11 @@ public class Offer {
 		this.offerID = offerID;
 	}
 	
-	public String getOfferURI() {
-		return offerURI;
+	public String getOfferPage() {
+		return offerPage;
 	}
-	public void setOfferURI(String offerURI) {
-		this.offerURI = offerURI;
+	public void setOfferPage(String offerPage) {
+		this.offerPage = offerPage;
 	}
 	public String getIncludes() {
 		return includes;
@@ -42,17 +44,24 @@ public class Offer {
 	public void setIncludes(String includes) {
 		this.includes = includes;
 	}
-	public String getValidFrom() {
+	
+	public Date getValidFrom() {
 		return validFrom;
 	}
-	public void setValidFrom(String validFrom) {
+	public void setValidFrom(Date validFrom) {
 		this.validFrom = validFrom;
 	}
-	public String getValidThrough() {
+	public Date getValidThrough() {
 		return validThrough;
 	}
-	public void setValidThrough(String validThrough) {
+	public void setValidThrough(Date validThrough) {
 		this.validThrough = validThrough;
+	}
+	public void setPrice(float price) {
+		this.price = price;
+	}
+	public float getPrice() {
+		return price;
 	}
 	public String getHasCurrency() {
 		return hasCurrency;
@@ -60,24 +69,11 @@ public class Offer {
 	public void setHasCurrency(String hasCurrency) {
 		this.hasCurrency = hasCurrency;
 	}
-	public String getPrice() {
-		return price;
-	}
-	public void setPrice(String price) {
-		this.price = price;
-	}
 	public String getDescription() {
 		return description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-	
 	
 }

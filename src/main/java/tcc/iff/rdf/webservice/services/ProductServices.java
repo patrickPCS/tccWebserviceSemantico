@@ -59,16 +59,7 @@ public class ProductServices {
 	public void deleteCompany(String productID) {
 		auth.getAuthentication();
 		
-		String querySelect = methods.getProductSparqlSelect(productID);
-		
-		Query querySc = QueryFactory.create(querySelect);
-		QueryExecution queryExec = QueryExecutionFactory.sparqlService(sparqlEndpoint, querySc);
-		ResultSet result = queryExec.execSelect();
-		
-		QuerySolution soln = result.nextSolution();
-		String productType = soln.getResource("productType").toString();
-		
-		String queryUpdate = methods.deleteProductSparql(productID, productType);
+		String queryUpdate = methods.deleteProductSparql(productID);
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();
@@ -99,20 +90,18 @@ public class ProductServices {
 			QuerySolution soln = result.nextSolution();
 			//String productName = soln.getLiteral("productName").toString();
 			String productLabel = soln.getLiteral("productLabel").toString();
-			String productURL = soln.getResource("productURL").toString();
+			String productPage = soln.getResource("productPage").toString();
 			String productDescription = soln.getLiteral("productDescription").toString();
 			String productComment = soln.getLiteral("productComment").toString();
-			String productLanguage = soln.getLiteral("productLanguage").toString();
 			String productType = soln.getResource("productType").toString();
 			
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("ProductID", productID)
 					//.add("ProductName", productName)
 					.add("ProductLabel", productLabel)
-					.add("ProductURL", productURL)
+					.add("productPage", productPage)
 					.add("ProductDescription", productDescription)
 					.add("ProductComment", productComment)
-					.add("ProductLanguage", productLanguage)
 					.add("Tipo de Produto", productType)
 					.build();
 			
@@ -149,10 +138,9 @@ public class ProductServices {
 			String productID = productList.get(i).getProductID();
 			String productName = productList.get(i).getProductName();
 			String productLabel = productList.get(i).getProductName();
-			String productURL = productList.get(i).getProductURL();
+			String productPage = productList.get(i).getProductPage();
 			String productDescription = productList.get(i).getProductDescription();
 			String productComment = productList.get(i).getProductDescription();
-			String productLanguage = productList.get(i).getProductLanguage();
 			String productType = productList.get(i).getProductType();
 			
 			String queryDescribe  = methods.getProductDescribe(productID);
@@ -161,7 +149,7 @@ public class ProductServices {
 
 			Model results = qexec.execDescribe();
 			if(results.isEmpty()) {
-				String queryInsert = methods.insertProductSpaqrl(productID, productType, productName, productLabel, productDescription, productComment, productLanguage, productURL);
+				String queryInsert = methods.insertProductSpaqrl(productID, productType, productName, productLabel, productDescription, productComment, productPage);
 				
 				UpdateRequest request = UpdateFactory.create(queryInsert);
 				UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -196,13 +184,12 @@ public class ProductServices {
 		String productID = newProduct.getProductID();
 		//String productName = newProduct.getProductName();
 		String productLabel = newProduct.getProductName();
-		String productURL = newProduct.getProductURL();
+		String productPage = newProduct.getProductPage();
 		String productDescription = newProduct.getProductDescription();
 		String productComment = newProduct.getProductDescription();
-		String productLanguage = newProduct.getProductLanguage();
 		String productType = newProduct.getProductType();
 		
-		String queryUpdate = methods.updateProductSparql(oldProductID, productID, productType, productLabel, productDescription, productComment, productLanguage, productURL);
+		String queryUpdate = methods.updateProductSparql(oldProductID, productID, productType, productLabel, productDescription, productComment, productPage);
 		UpdateRequest request = UpdateFactory.create(queryUpdate);
 		UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
 		up.execute();

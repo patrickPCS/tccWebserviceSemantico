@@ -3,10 +3,9 @@ package tcc.iff.rdf.webservice.model;
 public class Product {
 	
 	private String productID;
-	private String productURL;
+	private String productPage;
 	private String productDescription;
 	private String productName;
-	private String productLanguage;
 	private String productType;
 	
 	public String getProductID() {
@@ -15,11 +14,11 @@ public class Product {
 	public void setProductID(String productID) {
 		this.productID = productID;
 	}
-	public String getProductURL() {
-		return productURL;
+	public String getProductPage() {
+		return productPage;
 	}
-	public void setProductURL(String productURL) {
-		this.productURL = productURL;
+	public void setProductPage(String productPage) {
+		this.productPage = productPage;
 	}
 	public String getProductDescription() {
 		return productDescription;
@@ -32,12 +31,6 @@ public class Product {
 	}
 	public void setProductName(String productName) {
 		this.productName = productName;
-	}
-	public String getProductLanguage() {
-		return productLanguage;
-	}
-	public void setProductLanguage(String productLanguage) {
-		this.productLanguage = productLanguage;
 	}
 	public String getProductType() {
 		return productType;

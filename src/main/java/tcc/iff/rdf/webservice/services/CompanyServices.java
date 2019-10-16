@@ -82,7 +82,7 @@ public class CompanyServices {
 			ResultSet results = qexec.execSelect();
 			
 			QuerySolution soln = results.nextSolution();
-			String companyURL = soln.getResource("companyURL").toString() ;  
+			String homePage = soln.getResource("homePage").toString() ;  
 			String legalName = soln.getLiteral("legalName").toString();
 			String grLegalName = soln.getLiteral("grLegalName").toString();
 			String email = soln.getLiteral("email").toString() ;
@@ -91,7 +91,7 @@ public class CompanyServices {
  
 			JsonObject jobj = Json.createObjectBuilder()
 					.add("id", companyID)
-					.add("companyURL",companyURL)
+					.add("homePage",homePage)
 					.add("legalName",legalName)
 					.add("grLegalName", grLegalName)
 					.add("email",email)
@@ -130,7 +130,7 @@ public class CompanyServices {
 		String exco = "http://localhost:8080/webservice/webapi/companies/";
 		for(int i=0; i<TAM; i++) {
 			String companyID = companyList.get(i).getCompanyID();
-			String companyURL = companyList.get(i).getCompanyURL();
+			String homePage = companyList.get(i).getHomePage();
 			String legalName = companyList.get(i).getLegalName();
 			String grLegalName = companyList.get(i).getLegalName();
 			String email = companyList.get(i).getEmail();
@@ -144,7 +144,7 @@ public class CompanyServices {
 			Model results = qexec.execDescribe();
 			if (results.isEmpty()) {
 	
-			String queryUpdate = methods.insertCompanySparql(companyID, name, legalName, grLegalName, companyURL, email  );
+			String queryUpdate = methods.insertCompanySparql(companyID, name, legalName, grLegalName, homePage, email  );
 	
 			UpdateRequest request = UpdateFactory.create(queryUpdate);
 			UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);
@@ -179,14 +179,14 @@ public class CompanyServices {
 	String exco = "http://localhost:8080/webservice/webapi/companies/";
 	
 	String companyID = newCompany.getCompanyID();
-	String companyURL = newCompany.getCompanyURL();
+	String homePage = newCompany.getHomePage();
 	String legalName = newCompany.getLegalName();
 	String grLegalName = newCompany.getLegalName();
 	String email = newCompany.getEmail();
 	String name = newCompany.getName();
 	String label = newCompany.getName();
 
-	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, companyURL, email, name, legalName, label, grLegalName);
+	String queryUpdate = methods.updateCompanySparql(oldCompanyID, companyID, homePage, email, name, legalName, label, grLegalName);
 	
 	UpdateRequest request = UpdateFactory.create(queryUpdate);
 	UpdateProcessor up = UpdateExecutionFactory.createRemote(request, sparqlEndpoint);

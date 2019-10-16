@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Company {
 	private String companyID;
-	private String companyURL;
+	private String homePage;
 	private String legalName;
 	private String email;
 	private String name;
@@ -22,11 +22,11 @@ public class Company {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getCompanyURL() {
-		return companyURL;
+	public String getHomePage() {
+		return homePage;
 	}
-	public void setCompanyURL(String companyURL) {
-		this.companyURL = companyURL;
+	public void setHomePage(String homePage) {
+		this.homePage = homePage;
 	}
 	public String getLegalName() {
 		return legalName;
